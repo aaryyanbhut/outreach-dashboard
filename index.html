@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AK Reliance Outreach Dashboard</title>
+<style>
+:root{
+  --bg:#040714;--bg2:#07111f;--panel:rgba(15,23,42,.88);--panel2:rgba(30,41,59,.68);
+  --line:rgba(56,189,248,.20);--line2:rgba(56,189,248,.58);--text:#f8fafc;--muted:#94a3b8;
+  --accent:#38bdf8;--accent2:#818cf8;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;
+  --shadow:0 30px 100px rgba(0,0,0,.46)
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:
+radial-gradient(circle at 18% -8%,rgba(56,189,248,.26),transparent 31%),
+radial-gradient(circle at 88% 0%,rgba(129,140,248,.22),transparent 28%),
+linear-gradient(180deg,#030712,var(--bg2) 48%,#020617);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px);background-size:50px 50px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 78%)}
+.app{width:min(1520px,calc(100vw - 34px));margin:0 auto;padding:26px 0 28px;position:relative;z-index:1}
+.topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:22px;border:1px solid rgba(56,189,248,.18);border-radius:32px;background:linear-gradient(135deg,rgba(15,23,42,.78),rgba(2,6,23,.62)),radial-gradient(circle at top right,rgba(56,189,248,.16),transparent 36%);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;position:relative}
+.topbar:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(56,189,248,.16),transparent);transform:translateX(-100%);animation:sweep 6s ease-in-out infinite}
+@keyframes sweep{0%,58%{transform:translateX(-100%)}78%,100%{transform:translateX(100%)}}
+.brand,.controls{position:relative;z-index:2}
+.brand{display:flex;align-items:center;gap:16px}
+.logo{width:86px;height:86px;border-radius:30px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(56,189,248,.3),rgba(129,140,248,.16)),rgba(2,6,23,.78);border:1px solid var(--line2);box-shadow:0 0 52px rgba(56,189,248,.28),inset 0 0 35px rgba(56,189,248,.13);position:relative;overflow:hidden;font-weight:950}
+.logo:before{content:"";position:absolute;width:145%;height:145%;background:conic-gradient(from 180deg,transparent,rgba(56,189,248,.45),rgba(129,140,248,.25),transparent 42%);animation:spin 7s linear infinite}
+.logo:after{content:"";position:absolute;inset:2px;border-radius:28px;background:linear-gradient(135deg,rgba(2,6,23,.88),rgba(15,23,42,.78));z-index:1}
+.logo span{z-index:2;font-size:26px;letter-spacing:-.06em;text-shadow:0 0 26px rgba(56,189,248,.55)}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{margin:0;font-size:clamp(42px,4.5vw,76px);line-height:.96;letter-spacing:-.085em;background:linear-gradient(90deg,#f8fafc,#bae6fd 42%,#818cf8 82%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 46px rgba(56,189,248,.18)}
+.subtitle{margin-top:12px;color:rgba(186,230,253,.78);font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;max-width:620px}
+button,.file-label,input,select,textarea{border:1px solid var(--line);background:rgba(15,23,42,.84);color:var(--text);border-radius:16px;font:inherit;outline:none}
+button,.file-label{cursor:pointer;padding:12px 15px;font-weight:850;transition:.16s ease;user-select:none}
+button:hover,.file-label:hover{transform:translateY(-1px);border-color:var(--line2);background:rgba(30,41,59,.94);box-shadow:0 0 24px rgba(56,189,248,.16)}
+button:active{transform:scale(.99)}
+.primary,.action-primary{background:linear-gradient(135deg,rgba(56,189,248,.34),rgba(129,140,248,.23));border-color:var(--line2);box-shadow:0 0 26px rgba(56,189,248,.14)}
+.action-primary{font-weight:950;text-transform:uppercase;letter-spacing:.04em}
+.danger{border-color:rgba(239,68,68,.45);color:#fecaca}.success{border-color:rgba(34,197,94,.45);color:#bbf7d0}
+input[type=file]{display:none}
+.notice,.next-action,.panel,.command-card{backdrop-filter:blur(14px)}
+.notice{margin-bottom:18px;padding:15px 18px;border-radius:24px;background:linear-gradient(135deg,rgba(8,47,73,.6),rgba(30,41,59,.54));border:1px solid rgba(56,189,248,.30);display:flex;justify-content:space-between;gap:12px;align-items:center}
+.notice strong{color:var(--accent)}
+.next-action{margin-bottom:18px;border-radius:34px;padding:24px;border:1px solid rgba(56,189,248,.32);background:linear-gradient(135deg,rgba(15,23,42,.92),rgba(2,6,23,.78)),radial-gradient(circle at 78% 10%,rgba(56,189,248,.20),transparent 34%);box-shadow:0 30px 100px rgba(0,0,0,.42),0 0 52px rgba(56,189,248,.10)}
+.next-kicker{color:var(--accent);font-size:12px;text-transform:uppercase;letter-spacing:.18em;font-weight:950}
+.next-title{font-size:34px;font-weight:950;letter-spacing:-.06em;margin:8px 0}
+.next-sub{color:var(--muted);line-height:1.5}
+.next-actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.command-strip{display:grid;grid-template-columns:1.2fr 1fr 1fr 1.15fr;gap:14px;margin-bottom:18px}
+.command-card{min-height:112px;border-radius:28px;padding:18px;background:linear-gradient(145deg,rgba(15,23,42,.92),rgba(8,13,26,.72)),radial-gradient(circle at top right,rgba(56,189,248,.16),transparent 36%);border:1px solid rgba(56,189,248,.25);box-shadow:0 18px 60px rgba(0,0,0,.28)}
+.command-label{color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.command-value{font-size:30px;font-weight:950;margin-top:10px;letter-spacing:-.05em}.mini-brand{color:var(--accent)}
+.pulse-dot{width:8px;height:8px;border-radius:999px;background:var(--success);display:inline-block;box-shadow:0 0 18px rgba(34,197,94,.7);margin-right:8px;animation:pulseDot 1.6s ease infinite}@keyframes pulseDot{50%{transform:scale(1.55)}}
+.grid{display:grid;grid-template-columns:minmax(380px,.92fr) minmax(650px,2.08fr);gap:20px;align-items:start}
+.panel{border-radius:32px;border:1px solid rgba(56,189,248,.22);background:linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.78)),radial-gradient(circle at top right,rgba(56,189,248,.08),transparent 34%);box-shadow:var(--shadow);overflow:hidden}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px;border-bottom:1px solid rgba(56,189,248,.12);background:linear-gradient(135deg,rgba(2,6,23,.78),rgba(15,23,42,.56))}
+.panel-title{font-weight:950;font-size:22px;letter-spacing:-.055em}.panel-sub{color:var(--muted);font-size:12px;margin-top:6px}.panel-body{padding:22px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.metric{min-height:118px;padding:18px;border-radius:26px;background:linear-gradient(145deg,rgba(30,41,59,.68),rgba(15,23,42,.62));border:1px solid rgba(56,189,248,.18);transition:.18s ease}.metric:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.36)}
+.metric .label{color:var(--muted);font-size:11px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}.metric .value{font-size:38px;font-weight:950;margin-top:12px;letter-spacing:-.06em}.accent{color:var(--accent)}.successText{color:var(--success)}.warningText{color:var(--warning)}
+.progress-box{margin-top:14px;padding:18px;border-radius:26px;background:linear-gradient(135deg,rgba(2,6,23,.60),rgba(15,23,42,.66));border:1px solid rgba(56,189,248,.18)}
+.progress-line{display:flex;justify-content:space-between;gap:12px;margin-bottom:11px;font-weight:900}.bar{height:18px;border-radius:999px;background:rgba(148,163,184,.18);overflow:hidden;border:1px solid rgba(56,189,248,.18);box-shadow:inset 0 0 16px rgba(0,0,0,.35)}.bar>div{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#38bdf8,#818cf8,#22c55e);box-shadow:0 0 18px rgba(56,189,248,.45);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.done-today{margin-top:12px;padding:12px 14px;border-radius:16px;background:rgba(34,197,94,.10);color:#bbf7d0;border:1px solid rgba(34,197,94,.22);display:none;font-weight:900}
+.tabs{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;padding:8px;border-radius:999px;background:rgba(2,6,23,.42);border:1px solid rgba(56,189,248,.10)}.tab{border-color:transparent;border-radius:999px;padding:11px 15px;color:var(--muted)}.tab.active{color:var(--text);background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(129,140,248,.16));box-shadow:0 0 26px rgba(56,189,248,.13)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}.toolbar input,.toolbar select{padding:11px 12px;min-width:170px}
+.lead-list{display:grid;gap:12px}.lead-card{border-radius:28px;padding:18px;display:grid;grid-template-columns:50px 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(15,23,42,.86),rgba(2,6,23,.60));border:1px solid rgba(56,189,248,.20);box-shadow:inset 0 0 0 1px rgba(255,255,255,.015),0 10px 28px rgba(0,0,0,.22);transition:.23s ease;animation:rise .26s ease both}
+.lead-card:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.36);box-shadow:0 0 34px rgba(56,189,248,.10),0 16px 40px rgba(0,0,0,.26)}
+.lead-card.expanded{border-color:rgba(56,189,248,.58);box-shadow:0 0 42px rgba(56,189,248,.15),0 20px 55px rgba(0,0,0,.33)}
+@keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}.lead-card.completing{transform:translateX(14px) scale(.985);opacity:0}
+.rank{width:46px;height:46px;border-radius:18px;display:grid;place-items:center;background:rgba(56,189,248,.10);color:var(--accent);border:1px solid rgba(56,189,248,.25);font-weight:950}.lead-name{font-size:18px;font-weight:950;letter-spacing:-.03em;margin-bottom:10px}.lead-meta{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px}.pill,.link-pill{padding:7px 11px;border-radius:999px;border:1px solid rgba(56,189,248,.14);background:rgba(30,41,59,.55);color:var(--muted);text-decoration:none;font-weight:800}.link-pill{color:var(--accent);border-color:rgba(56,189,248,.25)}
+.card-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}.expanded-panel{grid-column:1 / -1;padding:16px;border-radius:22px;background:rgba(2,6,23,.46);border:1px solid rgba(56,189,248,.14);display:none}.lead-card.expanded .expanded-panel{display:block}.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.reply-btn{font-weight:950;text-transform:uppercase;letter-spacing:.04em}.reply-btn.hot{background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(56,189,248,.18));border-color:rgba(245,158,11,.45)}.reply-btn.win{background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(56,189,248,.18));border-color:rgba(34,197,94,.45)}
+.empty{padding:34px 18px;text-align:center;color:var(--muted);border:1px dashed rgba(56,189,248,.22);border-radius:20px;background:rgba(15,23,42,.42)}
+.small-note{color:var(--muted);font-size:12px;line-height:1.5}table{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:13px}th,td{padding:12px 10px;text-align:left;vertical-align:middle;white-space:nowrap}th{color:var(--accent);background:transparent;text-transform:uppercase;letter-spacing:.10em;font-size:11px}td{background:rgba(15,23,42,.54);border-bottom:1px solid rgba(56,189,248,.08)}tr td:first-child{border-radius:14px 0 0 14px}tr td:last-child{border-radius:0 14px 14px 0}
+.modal-backdrop,.welcome-backdrop,.celebration-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.76);display:none;align-items:center;justify-content:center;padding:20px;z-index:50;overflow-y:auto}.modal,.welcome,.celebration{width:min(780px,100%);max-height:calc(100vh - 40px);overflow-y:auto;background:radial-gradient(circle at top right,rgba(56,189,248,.20),transparent 36%),radial-gradient(circle at bottom left,rgba(129,140,248,.12),transparent 32%),#070b18;border:1px solid var(--line2);border-radius:34px;box-shadow:var(--shadow);padding:22px}.modal h2,.welcome h2,.celebration h2{font-size:38px;letter-spacing:-.06em;margin:0 0 8px;background:linear-gradient(90deg,#f8fafc,#bae6fd,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent}.modal .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.modal input,.modal textarea,.modal select,.welcome input,.welcome select{width:100%;padding:12px}.welcome-logo{width:88px;height:88px;border-radius:30px;border:1px solid var(--line2);display:grid;place-items:center;color:var(--accent);font-weight:950;font-size:22px;margin-bottom:14px;background:rgba(56,189,248,.09);box-shadow:0 0 36px rgba(56,189,248,.18)}
+.toast{position:fixed;right:22px;bottom:22px;max-width:420px;padding:13px 15px;border-radius:16px;background:rgba(15,23,42,.96);border:1px solid var(--line2);box-shadow:var(--shadow);transform:translateY(16px);opacity:0;pointer-events:none;transition:.22s ease;z-index:60;font-weight:850}.toast.show{transform:translateY(0);opacity:1}
+.footer{margin-top:22px;display:flex;justify-content:space-between;gap:12px;align-items:center;padding:17px 20px;border-radius:28px;background:rgba(2,6,23,.62);border:1px solid rgba(56,189,248,.14);color:var(--muted);font-size:12px;font-weight:750}.footer strong{color:var(--accent)}
+.glow{animation:glowPulse 1.1s ease both}@keyframes glowPulse{35%{box-shadow:0 0 55px rgba(56,189,248,.34);border-color:rgba(56,189,248,.8)}}
+.guide-grid{display:grid;gap:14px}.guide-card{padding:18px;border-radius:24px;background:rgba(15,23,42,.62);border:1px solid rgba(56,189,248,.15)}.guide-card h3{margin:0 0 8px}.guide-card p,.guide-card li{color:var(--muted);line-height:1.6}
+@media(max-width:1050px){.grid{grid-template-columns:1fr}.command-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar{align-items:flex-start;flex-direction:column}.controls{justify-content:flex-start}}
+@media(max-width:720px){.app{width:min(100vw - 22px,1440px);padding-top:14px}.command-strip,.metrics{grid-template-columns:1fr}.lead-card{grid-template-columns:1fr}.rank{display:none}.card-actions{justify-content:flex-start}.modal .row{grid-template-columns:1fr}.footer{flex-direction:column;align-items:flex-start}h1{font-size:40px}.logo{width:72px;height:72px}}
+</style>
+
+<style id="ak-violet-lightning-upgrade">
+:root{
+  --bg:#02030a!important;
+  --bg2:#070011!important;
+  --accent:#8b5cf6!important;
+  --accent2:#38bdf8!important;
+  --line:rgba(139,92,246,.22)!important;
+  --line2:rgba(139,92,246,.62)!important;
+}
+body{
+  background:
+    radial-gradient(circle at 15% -8%,rgba(139,92,246,.34),transparent 28%),
+    radial-gradient(circle at 88% 0%,rgba(56,189,248,.16),transparent 23%),
+    radial-gradient(circle at 70% 110%,rgba(139,92,246,.13),transparent 32%),
+    linear-gradient(180deg,#02030a,#060012 48%,#01030a)!important;
+}
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,transparent 0 42%,rgba(139,92,246,.12) 43%,transparent 45%),
+    linear-gradient(132deg,transparent 0 61%,rgba(56,189,248,.07) 62%,transparent 64%);
+  opacity:.85;
+  z-index:0;
+}
+.topbar,.panel,.next-action,.command-card{
+  background:
+    linear-gradient(145deg,rgba(10,10,24,.92),rgba(3,7,18,.82)),
+    radial-gradient(circle at top right,rgba(139,92,246,.20),transparent 34%)!important;
+  border-color:rgba(139,92,246,.34)!important;
+  box-shadow:0 30px 110px rgba(0,0,0,.55),0 0 54px rgba(139,92,246,.10)!important;
+}
+h1{
+  background:linear-gradient(90deg,#fff,#ddd6fe 38%,#8b5cf6 70%,#38bdf8)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+}
+.logo{
+  border-color:rgba(139,92,246,.72)!important;
+  box-shadow:0 0 58px rgba(139,92,246,.30),inset 0 0 35px rgba(139,92,246,.14)!important;
+}
+.logo:before{
+  background:conic-gradient(from 180deg,transparent,rgba(139,92,246,.58),rgba(56,189,248,.22),transparent 42%)!important;
+}
+.primary,.action-primary,.tab.active{
+  background:linear-gradient(135deg,rgba(139,92,246,.38),rgba(56,189,248,.18))!important;
+  border-color:rgba(139,92,246,.62)!important;
+  box-shadow:0 0 28px rgba(139,92,246,.18)!important;
+}
+.action-primary,.reply-btn{
+  box-shadow:0 0 22px rgba(139,92,246,.16)!important;
+}
+.metric,.lead-card,.progress-box{
+  background:linear-gradient(145deg,rgba(13,12,28,.80),rgba(3,7,18,.70))!important;
+  border-color:rgba(139,92,246,.22)!important;
+}
+.lead-card:hover,.lead-card.expanded{
+  border-color:rgba(139,92,246,.62)!important;
+  box-shadow:0 0 42px rgba(139,92,246,.18),0 18px 50px rgba(0,0,0,.36)!important;
+}
+.bar>div{
+  background:linear-gradient(90deg,#8b5cf6,#38bdf8,#a78bfa)!important;
+}
+.link-pill,.accent,.mini-brand,.next-kicker,.footer strong{
+  color:#a78bfa!important;
+}
+.channel-warning{
+  margin-top:10px;
+  display:inline-flex;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(245,158,11,.10);
+  border:1px solid rgba(245,158,11,.28);
+  color:#fbbf24;
+  font-size:12px;
+  font-weight:850;
+}
+.select-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.lead-check{
+  width:18px;
+  height:18px;
+  accent-color:#8b5cf6;
+}
+.delete-modal-actions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  margin-top:18px;
+}
+</style>
+
+
+<style id="violet-lightning-animation">
+  #lightningCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.72;
+    mix-blend-mode: screen;
+  }
+
+  #cursorAura {
+    position: fixed;
+    width: 420px;
+    height: 420px;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle, rgba(139,92,246,.20), rgba(56,189,248,.08) 34%, transparent 68%);
+    filter: blur(8px);
+    opacity: .75;
+    transition: opacity .22s ease;
+    mix-blend-mode: screen;
+  }
+
+  .topbar h1 {
+    position: relative;
+    animation: titlePulse 5.8s ease-in-out infinite;
+  }
+
+  .topbar h1::after {
+    content: "";
+    position: absolute;
+    inset: -12px -18px;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 0 35%, rgba(167,139,250,.55) 42%, transparent 48% 100%);
+    transform: translateX(-120%) skewX(-18deg);
+    animation: titleSweep 6.8s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes titleSweep {
+    0%, 58% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+    68% { opacity: .85; }
+    88%,100% { transform: translateX(120%) skewX(-18deg); opacity: 0; }
+  }
+
+  @keyframes titlePulse {
+    0%,100% { filter: drop-shadow(0 0 12px rgba(139,92,246,.18)); }
+    50% { filter: drop-shadow(0 0 28px rgba(139,92,246,.34)); }
+  }
+
+  .panel:hover,
+  .next-action:hover,
+  .command-card:hover {
+    box-shadow:
+      0 34px 110px rgba(0,0,0,.55),
+      0 0 58px rgba(139,92,246,.16),
+      inset 0 0 0 1px rgba(167,139,250,.06) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #lightningCanvas, #cursorAura { display: none; }
+    .topbar h1, .topbar h1::after { animation: none !important; }
+  }
+</style>
+
+
+<style id="interaction-upgrade">
+  .next-mode-row {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .mode-switch {
+    display: inline-flex;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(2,6,23,.62);
+    border: 1px solid rgba(139,92,246,.26);
+    box-shadow: inset 0 0 22px rgba(139,92,246,.08);
+  }
+
+  .mode-pill {
+    border-radius: 999px;
+    padding: 11px 16px;
+    color: rgba(226,232,240,.72);
+    border-color: transparent;
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-pill.active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(139,92,246,.42), rgba(56,189,248,.18));
+    border-color: rgba(167,139,250,.55);
+    box-shadow: 0 0 28px rgba(139,92,246,.22);
+  }
+
+  .mode-pill.active::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.26), transparent);
+    transform: translateX(-140%) skewX(-16deg);
+    animation: modeSweep 2.8s ease infinite;
+  }
+
+  @keyframes modeSweep {
+    0%, 45% { transform: translateX(-140%) skewX(-16deg); }
+    90%, 100% { transform: translateX(140%) skewX(-16deg); }
+  }
+
+  .select-box {
+    position: relative;
+  }
+
+  .lead-check {
+    appearance: none;
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 8px;
+    border: 1px solid rgba(167,139,250,.48);
+    background: rgba(2,6,23,.72);
+    box-shadow: inset 0 0 12px rgba(139,92,246,.10), 0 0 0 rgba(139,92,246,0);
+    cursor: pointer;
+    transition: transform .16s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+    position: relative;
+  }
+
+  .lead-check:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 18px rgba(139,92,246,.24);
+  }
+
+  .lead-check:checked {
+    background: radial-gradient(circle at 50% 50%, #a78bfa, #7c3aed);
+    border-color: rgba(221,214,254,.95);
+    box-shadow: 0 0 24px rgba(139,92,246,.46), 0 0 42px rgba(56,189,248,.12);
+    animation: checkPop .22s ease both;
+  }
+
+  .lead-check:checked::after {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 15px;
+    font-weight: 950;
+  }
+
+  @keyframes checkPop {
+    0% { transform: scale(.72); }
+    70% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+
+  .lead-card.selected {
+    border-color: rgba(167,139,250,.78) !important;
+    background:
+      linear-gradient(135deg, rgba(45,20,90,.70), rgba(2,6,23,.70)) !important;
+    box-shadow: 0 0 42px rgba(139,92,246,.22), 0 18px 50px rgba(0,0,0,.36) !important;
+  }
+
+  .floating-selection {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translate(-50%, 22px) scale(.96);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 999px;
+    background:
+      linear-gradient(135deg, rgba(15,23,42,.94), rgba(10,10,24,.92)),
+      radial-gradient(circle at top right, rgba(139,92,246,.22), transparent 42%);
+    border: 1px solid rgba(167,139,250,.48);
+    box-shadow: 0 22px 80px rgba(0,0,0,.48), 0 0 42px rgba(139,92,246,.22);
+    backdrop-filter: blur(14px);
+    transition: opacity .18s ease, transform .18s ease, left .14s ease, top .14s ease;
+  }
+
+  .floating-selection.show {
+    opacity: .42;
+    transform: translate(-50%, 0) scale(1);
+    pointer-events: auto;
+  }
+
+  .floating-selection span {
+    font-weight: 950;
+    color: #ddd6fe;
+    padding: 0 8px;
+  }
+
+  .cursor-spark {
+    position: fixed;
+    pointer-events: none;
+    z-index: 2;
+    width: 42px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(167,139,250,.95), rgba(56,189,248,.55), transparent);
+    box-shadow: 0 0 16px rgba(139,92,246,.65);
+    transform-origin: left center;
+    animation: sparkFade .42s ease forwards;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes sparkFade {
+    0% { opacity: .95; transform: scaleX(.35) rotate(var(--rot)); }
+    100% { opacity: 0; transform: scaleX(1.35) translateX(24px) rotate(var(--rot)); }
+  }
+
+  @media(max-width:720px){
+    .floating-selection {
+      left: 50% !important;
+      right: auto;
+      bottom: 16px;
+      max-width: calc(100vw - 22px);
+      flex-wrap: wrap;
+      justify-content: center;
+      border-radius: 22px;
+    }
+  }
+</style>
+
+
+<style id="autosave-upgrade">
+  .autosave-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: rgba(34,197,94,.10);
+    border: 1px solid rgba(34,197,94,.28);
+    color: #bbf7d0;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    box-shadow: 0 0 18px rgba(34,197,94,.08);
+  }
+
+  .autosave-badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #22c55e;
+    box-shadow: 0 0 14px rgba(34,197,94,.75);
+  }
+
+  .autosave-badge.saving {
+    background: rgba(139,92,246,.12);
+    border-color: rgba(139,92,246,.36);
+    color: #ddd6fe;
+  }
+
+  .autosave-badge.saving::before {
+    background: #a78bfa;
+    box-shadow: 0 0 14px rgba(167,139,250,.75);
+    animation: autosavePulse .7s ease infinite;
+  }
+
+  @keyframes autosavePulse {
+    50% { transform: scale(1.45); opacity: .72; }
+  }
+</style>
+
+
+<style id="hero-and-lightning-v2">
+  .hero-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .next-action-left {
+    margin-bottom: 0 !important;
+    height: 100%;
+  }
+
+  .mode-panel {
+    border-radius: 34px;
+    padding: 24px;
+    border: 1px solid rgba(139,92,246,.32);
+    background:
+      linear-gradient(135deg,rgba(15,23,42,.92),rgba(2,6,23,.78)),
+      radial-gradient(circle at 78% 10%,rgba(139,92,246,.24),transparent 34%);
+    box-shadow: 0 30px 100px rgba(0,0,0,.42),0 0 52px rgba(139,92,246,.12);
+    backdrop-filter: blur(14px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-panel::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: conic-gradient(from 180deg, transparent, rgba(139,92,246,.16), transparent 28%);
+    animation: spin 10s linear infinite;
+    opacity: .55;
+  }
+
+  .mode-panel > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .mode-title {
+    font-size: 32px;
+    font-weight: 950;
+    letter-spacing: -.06em;
+    margin: 8px 0 16px;
+    background: linear-gradient(90deg,#fff,#ddd6fe,#8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .mode-switch {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    border-radius: 22px !important;
+    padding: 8px !important;
+  }
+
+  .mode-pill {
+    justify-content: center;
+    min-height: 54px;
+    font-size: 15px;
+  }
+
+  .lead-card.focused-lead {
+    animation: focusPulse 1.6s ease 2;
+    border-color: rgba(221,214,254,.92) !important;
+    box-shadow:
+      0 0 70px rgba(139,92,246,.36),
+      0 0 30px rgba(56,189,248,.16),
+      0 24px 70px rgba(0,0,0,.45) !important;
+  }
+
+  @keyframes focusPulse {
+    0%,100% { transform: translateY(0); }
+    45% { transform: translateY(-4px) scale(1.012); }
+  }
+
+  .cursor-bolt {
+    position: fixed;
+    pointer-events: none;
+    z-index: 3;
+    width: 54px;
+    height: 30px;
+    transform-origin: left center;
+    mix-blend-mode: screen;
+    animation: boltDie .28s ease-out forwards;
+  }
+
+  .cursor-bolt svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 10px rgba(167,139,250,.95)) drop-shadow(0 0 18px rgba(56,189,248,.35));
+  }
+
+  @keyframes boltDie {
+    0% { opacity: 0; transform: translate(0,0) scale(.55) rotate(var(--rot)); }
+    18% { opacity: .42; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.08) rotate(var(--rot)); }
+  }
+
+  @media(max-width:1050px){
+    .hero-split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+
+<style id="final-cursor-lightning-fibers">
+  .cursor-fiber {
+    position: fixed;
+    pointer-events: none;
+    z-index: 6;
+    width: 130px;
+    height: 78px;
+    transform-origin: left center;
+    mix-blend-mode: screen;
+    animation: fiberDie .62s ease-out forwards;
+  }
+
+  .cursor-fiber svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter:
+      drop-shadow(0 0 5px rgba(255,255,255,.75))
+      drop-shadow(0 0 12px rgba(167,139,250,.95))
+      drop-shadow(0 0 26px rgba(139,92,246,.78));
+  }
+
+  @keyframes fiberDie {
+    0% {
+      opacity: 0;
+      transform: translate(0,0) scale(.55) rotate(var(--rot));
+    }
+    10% { opacity: .42; }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) scale(1.18) rotate(var(--rot));
+    }
+  }
+
+  #cursorCore {
+    position: fixed;
+    pointer-events: none;
+    z-index: 7;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255,255,255,.96), rgba(167,139,250,.72) 32%, transparent 72%);
+    box-shadow:
+      0 0 12px rgba(255,255,255,.68),
+      0 0 26px rgba(167,139,250,.92),
+      0 0 48px rgba(139,92,246,.52);
+    opacity: .92;
+    mix-blend-mode: screen;
+  }
+
+  @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor-fiber, #cursorCore { display: none !important; }
+  }
+</style>
+
+
+<style id="subtle-purple-lightning-final">
+  #cursorCore {
+    display: none !important;
+  }
+
+  .cursor-fiber {
+    width: 72px !important;
+    height: 42px !important;
+    opacity: .42 !important;
+    filter: none !important;
+    animation: subtleFiberDie .34s ease-out forwards !important;
+  }
+
+  .cursor-fiber svg {
+    filter:
+      drop-shadow(0 0 4px rgba(167,139,250,.52))
+      drop-shadow(0 0 10px rgba(139,92,246,.32)) !important;
+  }
+
+  @keyframes subtleFiberDie {
+    0% {
+      opacity: .34;
+      transform: translate(0,0) scale(.72) rotate(var(--rot));
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) scale(.94) rotate(var(--rot));
+    }
+  }
+
+  #cursorAura {
+    width: 260px !important;
+    height: 260px !important;
+    opacity: .34 !important;
+    filter: blur(14px) !important;
+    background:
+      radial-gradient(circle, rgba(139,92,246,.16), rgba(167,139,250,.06) 36%, transparent 70%) !important;
+    transition: none !important;
+  }
+
+  #lightningCanvas {
+    opacity: .30 !important;
+  }
+</style>
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070011">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Outreach Dashboard">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style id="cloud-sync-styles">
+  .cloud-status-panel {
+    position: fixed;
+    right: 18px;
+    top: 18px;
+    z-index: 90;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: min(520px, calc(100vw - 36px));
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(15,23,42,.94), rgba(10,10,24,.90));
+    border: 1px solid rgba(167,139,250,.38);
+    box-shadow: 0 18px 70px rgba(0,0,0,.35), 0 0 30px rgba(139,92,246,.16);
+    backdrop-filter: blur(14px);
+  }
+  .cloud-status-panel span { color:#ddd6fe; font-size:12px; font-weight:900; padding:0 6px; }
+  .cloud-status-panel button { padding:8px 10px !important; font-size:12px; }
+  @media(max-width:720px){ .cloud-status-panel{left:12px; right:12px; top:auto; bottom:12px; border-radius:22px; justify-content:center;} }
+</style>
+
+
+<style id="red-welcome-upgrade">
+#redLightningCanvas{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:1;mix-blend-mode:screen;opacity:.78}
+#redCinematicAura{position:fixed;inset:-20%;pointer-events:none;z-index:0;background:radial-gradient(circle at 16% 10%,rgba(255,7,58,.20),transparent 26%),radial-gradient(circle at 86% 3%,rgba(255,0,64,.26),transparent 23%),radial-gradient(circle at 50% 110%,rgba(255,7,58,.13),transparent 32%);filter:blur(8px);animation:redAuraShift 9s ease-in-out infinite alternate}
+@keyframes redAuraShift{from{transform:translate3d(-1%,0,0) scale(1)}to{transform:translate3d(1.5%,1%,0) scale(1.03)}}
+.welcome-backdrop,.modal-backdrop,.celebration-backdrop{background:rgba(0,0,0,.72)!important;backdrop-filter:blur(18px) saturate(1.2)!important}
+.welcome{position:relative;overflow:hidden;border-radius:36px!important;background:radial-gradient(circle at 82% 0%,rgba(255,7,58,.34),transparent 34%),radial-gradient(circle at 8% 12%,rgba(255,7,58,.20),transparent 25%),linear-gradient(145deg,rgba(6,0,8,.98),rgba(20,0,8,.94) 44%,rgba(3,3,10,.98))!important;border:1px solid rgba(255,7,58,.62)!important;box-shadow:0 40px 140px rgba(0,0,0,.70),0 0 90px rgba(255,7,58,.25),inset 0 0 0 1px rgba(255,255,255,.04)!important}
+.welcome::before{content:"";position:absolute;inset:-20%;background:linear-gradient(120deg,transparent 0 33%,rgba(255,7,58,.22) 34%,transparent 36% 100%),linear-gradient(38deg,transparent 0 58%,rgba(255,7,58,.16) 59%,transparent 61% 100%);animation:redPanelStrike 4.6s ease-in-out infinite;opacity:.72;pointer-events:none}
+@keyframes redPanelStrike{0%,52%{transform:translateX(-70%) skewX(-16deg);opacity:0}65%{opacity:.85}88%,100%{transform:translateX(70%) skewX(-16deg);opacity:0}}
+.welcome>*{position:relative;z-index:2}.welcome-logo{border-color:rgba(255,7,58,.80)!important;color:#fff!important;background:radial-gradient(circle,rgba(255,7,58,.24),rgba(20,0,8,.80))!important;box-shadow:0 0 44px rgba(255,7,58,.35),inset 0 0 24px rgba(255,7,58,.12)!important;text-shadow:0 0 18px rgba(255,7,58,.90)}
+.welcome h2{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",Inter,sans-serif!important;text-transform:uppercase;letter-spacing:.01em!important;font-size:clamp(42px,6vw,72px)!important;line-height:.88!important;background:linear-gradient(90deg,#fff,#fecaca 35%,#ff073a 68%,#fff)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;filter:drop-shadow(0 0 24px rgba(255,7,58,.30))}
+.welcome .small-note{color:rgba(254,226,226,.82)!important}.welcome .metric{background:linear-gradient(145deg,rgba(24,0,12,.82),rgba(8,8,16,.72))!important;border-color:rgba(255,7,58,.24)!important}.welcome input,.welcome select{border-color:rgba(255,7,58,.28)!important;background:rgba(0,0,0,.44)!important}
+.welcome .primary,#startWelcome{background:linear-gradient(135deg,rgba(255,7,58,.48),rgba(139,0,28,.26))!important;border-color:rgba(255,7,58,.78)!important;box-shadow:0 0 34px rgba(255,7,58,.28)!important;text-transform:uppercase;letter-spacing:.06em}
+.app.glitch-hit,.panel.glitch-hit,.next-action.glitch-hit,.modal.glitch-hit,.welcome.glitch-hit,.celebration.glitch-hit{animation:akGlitchHit .38s steps(2,end) both}
+@keyframes akGlitchHit{0%{transform:translate(0,0);filter:none}18%{transform:translate(2px,-1px);filter:hue-rotate(-18deg) contrast(1.25)}32%{transform:translate(-3px,1px);clip-path:inset(5% 0 10% 0)}48%{transform:translate(3px,0);clip-path:inset(12% 0 4% 0)}64%{transform:translate(-1px,-2px);filter:drop-shadow(4px 0 rgba(255,7,58,.45))}100%{transform:translate(0,0);clip-path:inset(0);filter:none}}
+.glitch-flash{position:fixed;inset:0;z-index:999;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,7,58,.16),transparent),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 5px);mix-blend-mode:screen;animation:glitchFlash .24s ease-out forwards}
+@keyframes glitchFlash{from{opacity:.82;transform:skewX(-8deg) translateX(-2%)}to{opacity:0;transform:skewX(8deg) translateX(2%)}}
+.topbar h1{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",Inter,sans-serif!important;letter-spacing:.005em!important}
+@media (prefers-reduced-motion:reduce){#redLightningCanvas,#redCinematicAura{display:none!important}.welcome::before{animation:none!important}}
+</style>
+
+</head>
+<body>
+<canvas id="redLightningCanvas"></canvas>
+<div id="redCinematicAura"></div>
+<div id="cursorCore"></div>
+<canvas id="lightningCanvas"></canvas>
+<div id="cursorAura"></div>
+<div class="app">
+<div class="topbar"><div class="brand"><div class="logo"><span id="userInitials">OS</span></div><div><h1>Outreach Dashboard</h1><div class="subtitle" id="welcomeLine">Welcome</div></div></div><div class="controls"><label class="file-label primary" for="csvFile">Import CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button class="primary" id="manualImportBtn">Paste CSV</button><button id="sampleBtn">Load Sample</button><button id="removeSampleBtn" style="display:none">Remove Sample</button><button id="addLeadBtn">Add Lead</button><button class="danger" id="bulkDeleteBtn" style="display:none">Delete Selected</button><button id="exportJsonBtn">Save Backup</button><button id="exportCsvBtn">Export CSV</button><label class="file-label" for="backupFile">Restore</label><input id="backupFile" type="file" accept=".json,application/json"><button class="danger" id="resetBtn">Reset</button><div class="autosave-badge" id="autosaveBadge">Autosaved</div></div></div>
+<div class="notice" id="dailyNotice"><div><strong>Today:</strong> Loading...</div><button id="dismissNotice" class="ghost">Hide</button></div>
+<section class="hero-split">
+  <div class="next-action next-action-left">
+    <div class="next-kicker">Next Action Engine</div>
+    <div class="next-title" id="nextTitle">Loading...</div>
+    <div class="next-sub" id="nextSub">The app will tell you exactly what to do next.</div>
+    <div class="next-actions" id="nextActions"></div>
+  </div>
+  <div class="mode-panel">
+    <div class="next-kicker">Outreach Mode</div>
+    <div class="mode-title" id="modeTitle">Choose Channel</div>
+    <div class="mode-switch" id="modeSwitch">
+      <button class="mode-pill active" data-mode="Instagram">Instagram</button>
+      <button class="mode-pill" data-mode="Email">Email</button>
+    </div>
+    <div class="small-note" id="modeHint">Choose the outreach channel you want to work on right now.</div>
+  </div>
+</section>
+<div class="command-strip"><div class="command-card"><div class="command-label"><span class="pulse-dot"></span>System Status</div><div class="command-value" id="cStatus">Active</div></div><div class="command-card"><div class="command-label">Today’s Remaining</div><div class="command-value" id="cRemaining">0</div></div><div class="command-card"><div class="command-label">Follow-ups Due</div><div class="command-value" id="cFollowups">0</div></div><div class="command-card"><div class="command-label">Workspace</div><div class="command-value mini-brand" id="workspaceName">Your Dashboard</div></div></div>
+<div class="grid">
+<aside class="panel" id="dashboardPanel"><div class="panel-head"><div><div class="panel-title">Dashboard</div><div class="panel-sub">Your execution control room</div></div><button id="moreBtn" class="success">Show More Leads</button></div><div class="panel-body"><div class="metrics"><div class="metric"><div class="label">Total Leads</div><div class="value accent" id="mTotal">0</div></div><div class="metric"><div class="label">Total Sent</div><div class="value successText" id="mSent">0</div></div><div class="metric"><div class="label">Replies</div><div class="value accent" id="mReplies">0</div></div><div class="metric"><div class="label">Interested</div><div class="value warningText" id="mInterested">0</div></div><div class="metric"><div class="label">Calls Booked</div><div class="value accent" id="mCalls">0</div></div><div class="metric"><div class="label">Clients</div><div class="value successText" id="mClients">0</div></div></div><div class="progress-box"><div class="progress-line"><span>New Outreach Progress</span><span id="dailyText">0 / 0</span></div><div class="bar"><div id="dailyBar"></div></div><div class="done-today" id="doneToday">Done for today. Unlock another batch if you want.</div></div><div class="progress-box"><div class="progress-line"><span>Follow-up Progress</span><span id="followupText">0 / 0</span></div><div class="bar"><div id="followupBar"></div></div></div><div style="height:14px"></div><div class="metrics"><div class="metric"><div class="label">Daily Streak</div><div class="value accent" id="mStreak">0</div></div><div class="metric"><div class="label">Best Streak</div><div class="value successText" id="mBestStreak">0</div></div><div class="metric"><div class="label">Reply Rate</div><div class="value accent" id="mReplyRate">0%</div></div><div class="metric"><div class="label">Skipped Imports</div><div class="value" id="mSkipped">0</div></div></div></div></aside>
+<main class="panel"><div class="panel-head"><div><div class="panel-title">Action Board</div><div class="panel-sub">Click a lead to expand details, notes, and actions.</div></div><button id="refreshBtn">Refresh Follow-ups</button></div><div class="panel-body"><div class="tabs"><button class="tab active" data-tab="action">Action</button><button class="tab" data-tab="leads">All Leads</button><button class="tab" data-tab="hot">Hot Leads</button><button class="tab" data-tab="scripts">Scripts</button><button class="tab" data-tab="guide">Guide</button><button class="tab" data-tab="completed">Completed</button><button class="tab" data-tab="skipped">Skipped</button><button class="tab" data-tab="settings">Settings</button></div>
+<section id="tab-action"><div class="toolbar"><input id="searchAction" placeholder="Search active leads..."><select id="actionFilter"><option value="all">All active</option><option value="followup">Follow-ups only</option><option value="new">New leads only</option></select></div><div class="panel" style="box-shadow:none;margin-bottom:14px"><div class="panel-head"><div><div class="panel-title">Follow-ups Due</div><div class="panel-sub">Follow-ups appear first so nothing gets lost.</div></div></div><div class="panel-body"><div class="lead-list" id="followupList"></div></div></div><div class="panel" style="box-shadow:none"><div class="panel-head"><div><div class="panel-title">New Leads</div><div class="panel-sub">New outreach follows your daily target lock.</div></div></div><div class="panel-body"><div class="lead-list" id="newLeadList"></div></div></div></section>
+<section id="tab-leads" style="display:none"><div class="toolbar"><input id="searchAll" placeholder="Search all leads..."></div><div style="overflow:auto"><table id="leadsTable"></table></div></section>
+<section id="tab-hot" style="display:none"><div class="small-note" style="margin-bottom:12px">Interested, call booked, and client leads appear here.</div><div style="overflow:auto"><table id="hotTable"></table></div></section>
+<section id="tab-scripts" style="display:none"><div class="toolbar"><button class="primary" id="addScriptBtn">Add Script</button><select id="scriptNicheFilter"><option value="all">All niches</option></select></div><div style="overflow:auto"><table id="scriptsTable"></table></div></section>
+<section id="tab-guide" style="display:none">
+  <div class="guide-grid">
+    <div class="guide-card">
+      <h3>What this app is</h3>
+      <p>Outreach Dashboard is a local-first outreach operating system for SMMA owners, freelancers, agencies, and beginners who want a simple way to know exactly who to contact, who to follow up with, and which leads are becoming opportunities.</p>
+      <p>Your data is saved in your browser. You do not need an account. Use <strong>Save Backup</strong> if you want to protect your data or move it to another device.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Quick start</h3>
+      <ol>
+        <li>Complete the welcome setup with your name/business, niche, and daily outreach goals.</li>
+        <li>Import leads using <strong>Import CSV</strong>, <strong>Paste CSV</strong>, or <strong>Add Lead</strong>.</li>
+        <li>Choose <strong>Instagram Mode</strong> or <strong>Email Mode</strong> beside the Next Action Engine.</li>
+        <li>Use the <strong>Next Action Engine</strong> to know the next lead to contact.</li>
+        <li>Click <strong>Open Lead</strong> to jump directly to that lead.</li>
+        <li>Send the message manually on Instagram or email.</li>
+        <li>Come back and click <strong>Done</strong>.</li>
+        <li>When someone replies, click the right action button: Replied, Interested, Call Booked, Client, etc.</li>
+      </ol>
+    </div>
+
+    <div class="guide-card">
+      <h3>Welcome setup</h3>
+      <p>The welcome screen asks for your name or business name, niche, Instagram outreach goal, email outreach goal, and sound preference.</p>
+      <ul>
+        <li><strong>Name / Business Name:</strong> Personalizes the app and top-left initials.</li>
+        <li><strong>Niche:</strong> Helps organize your scripts and workspace.</li>
+        <li><strong>Instagram Goal:</strong> How many Instagram outreaches you want to send per day.</li>
+        <li><strong>Email Goal:</strong> How many email outreaches you want to send per day.</li>
+        <li><strong>Sound Effects:</strong> Turns the subtle whoosh on or off.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Next Action Engine</h3>
+      <p>This is the main brain of the app. It tells you what to do next instead of making you figure it out manually.</p>
+      <ul>
+        <li>If follow-ups are due, it prioritizes follow-ups.</li>
+        <li>If no follow-ups are due, it shows the next new lead.</li>
+        <li><strong>Open Lead</strong> jumps to the correct lead, expands it, and highlights it.</li>
+        <li><strong>Done</strong> marks the current action as completed.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Instagram Mode and Email Mode</h3>
+      <p>The mode switch controls what kind of outreach you are doing right now.</p>
+      <ul>
+        <li><strong>Instagram Mode:</strong> Only shows leads that have Instagram data.</li>
+        <li><strong>Email Mode:</strong> Only shows leads that have email data.</li>
+        <li>If a lead has both Instagram and email, it can appear in both modes.</li>
+        <li>If you already contacted a lead on the other channel, the app shows a warning like <strong>Already contacted on Instagram</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>What Done means</h3>
+      <p><strong>Done</strong> means you completed the current outreach action in the selected mode.</p>
+      <ul>
+        <li>If you are in Instagram Mode, Done marks Instagram outreach as sent.</li>
+        <li>If you are in Email Mode, Done marks email outreach as sent.</li>
+        <li>The lead can still appear in the other mode if it has that contact method.</li>
+        <li>Done also schedules the next follow-up based on the follow-up engine.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Follow-up engine</h3>
+      <p>The app automatically schedules follow-ups after outreach is marked Done.</p>
+      <ul>
+        <li>Follow-up 1: after 2 days</li>
+        <li>Follow-up 2: after 5 days</li>
+        <li>Follow-up 3: after 7 days</li>
+        <li>Final follow-up: after 10 days</li>
+      </ul>
+      <p>Click <strong>Refresh Follow-ups</strong> to update which follow-ups are due today.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Reply action buttons</h3>
+      <p>Click a lead card to expand it. Then use the reply buttons:</p>
+      <ul>
+        <li><strong>Replied:</strong> The lead responded.</li>
+        <li><strong>Interested:</strong> The lead showed interest and moves into Hot Leads.</li>
+        <li><strong>Not Interested:</strong> Stops follow-ups.</li>
+        <li><strong>Call Booked:</strong> Moves into Hot Leads and updates dashboard stats.</li>
+        <li><strong>Client:</strong> Marks the lead as converted.</li>
+        <li><strong>Lost:</strong> Stops active follow-up tracking.</li>
+        <li><strong>DNC:</strong> Do Not Contact. Stops follow-ups permanently.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Dashboard metrics</h3>
+      <ul>
+        <li><strong>Total Leads:</strong> All leads currently in the app.</li>
+        <li><strong>Total Sent:</strong> Leads/actions marked Done.</li>
+        <li><strong>Replies:</strong> Leads marked Replied.</li>
+        <li><strong>Interested:</strong> Leads marked Interested.</li>
+        <li><strong>Calls Booked:</strong> Leads marked Call Booked.</li>
+        <li><strong>Clients:</strong> Leads marked Client.</li>
+        <li><strong>Reply Rate:</strong> A simple performance indicator based on positive/reply statuses.</li>
+        <li><strong>Skipped Imports:</strong> Leads skipped during import because of duplicates or missing data.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Progress bars</h3>
+      <ul>
+        <li><strong>New Outreach Progress:</strong> Shows how close you are to your daily outreach goal.</li>
+        <li><strong>Follow-up Progress:</strong> Shows how many due follow-ups you completed today.</li>
+        <li><strong>Daily Streak:</strong> Tracks consecutive days you completed your base daily target.</li>
+        <li><strong>Best Streak:</strong> Your highest streak so far.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Action tab</h3>
+      <p>The Action tab is where you execute outreach.</p>
+      <ul>
+        <li><strong>Follow-ups Due:</strong> Leads that need a follow-up today.</li>
+        <li><strong>New Leads:</strong> Leads available for new outreach in your selected mode.</li>
+        <li>Click a lead to expand it.</li>
+        <li>Use Done after you send outreach.</li>
+        <li>Use reply buttons when the lead responds.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>All Leads tab</h3>
+      <p>This is your full lead database. You can search, view, edit, open notes, and delete leads.</p>
+      <ul>
+        <li><strong>Edit:</strong> Change business name, website, email, Instagram, phone, channel, or notes.</li>
+        <li><strong>Notes:</strong> Add reminders or context about the lead.</li>
+        <li><strong>Delete:</strong> Deletes a lead using the in-app delete modal.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Bulk select and delete</h3>
+      <p>Use the checkboxes next to leads to select multiple leads.</p>
+      <ul>
+        <li>Selected leads glow purple.</li>
+        <li>A floating delete bar appears near your selection.</li>
+        <li>Click <strong>Delete</strong> to open a custom delete confirmation.</li>
+        <li>Click <strong>Clear</strong> to remove the selection.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Hot Leads tab</h3>
+      <p>Hot Leads is where money-related opportunities appear.</p>
+      <ul>
+        <li>Interested leads</li>
+        <li>Call booked leads</li>
+        <li>Client leads</li>
+      </ul>
+      <p>This helps you separate real opportunities from normal cold outreach.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Scripts tab</h3>
+      <p>Save outreach scripts by niche and stage.</p>
+      <ul>
+        <li><strong>Add Script:</strong> Add a new script for a niche or follow-up stage.</li>
+        <li><strong>Copy:</strong> Copies the script so you can paste it into Instagram or email.</li>
+        <li><strong>Edit:</strong> Update a saved script.</li>
+        <li><strong>Delete:</strong> Remove a script you no longer use.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Completed tab</h3>
+      <p>Shows outreach actions that have been completed, grouped by recent completion dates. Use this to review your work and track what happened today or earlier.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Skipped tab</h3>
+      <p>When importing leads, the app skips bad or duplicate rows.</p>
+      <ul>
+        <li><strong>Missing name:</strong> The row had no business/name field.</li>
+        <li><strong>Duplicate:</strong> The lead already existed by email, Instagram, website, or name.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Settings tab</h3>
+      <p>Use Settings to update your workspace without resetting the app.</p>
+      <ul>
+        <li>Name / Business Name</li>
+        <li>Niche</li>
+        <li>Instagram on/off</li>
+        <li>Instagram daily goal</li>
+        <li>Email on/off</li>
+        <li>Email daily goal</li>
+        <li>Sound effects on/off</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Import CSV</h3>
+      <p>Use Import CSV to upload a lead file. Recommended headers:</p>
+      <ul>
+        <li>Name</li>
+        <li>Website</li>
+        <li>Email</li>
+        <li>Instagram</li>
+        <li>Phone</li>
+        <li>Notes</li>
+        <li>Channel</li>
+      </ul>
+      <p>The app automatically tries to understand common header names like Business Name, Company, Phone Number, Instagram URL, etc.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Paste CSV</h3>
+      <p>Paste CSV is useful when you copied data from another tool and do not want to upload a file. Make sure the first row contains headers.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Load Sample and Remove Sample</h3>
+      <p><strong>Load Sample</strong> adds fake sample leads so new users can understand the app instantly.</p>
+      <p><strong>Remove Sample</strong> appears only when sample data exists and removes only sample leads.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Save Backup and Restore</h3>
+      <p>This app saves in your browser, but you should still use backups.</p>
+      <ul>
+        <li><strong>Save Backup:</strong> Downloads a JSON backup containing your app data.</li>
+        <li><strong>Restore:</strong> Uploads a JSON backup into the app.</li>
+        <li>Use backup when switching browsers, laptops, or phones.</li>
+      </ul>
+    </div>
+
+    <div class="guide-card">
+      <h3>Export CSV</h3>
+      <p>Export CSV downloads your leads in spreadsheet format. It includes names, contact info, channel status, outreach status, reply status, follow-up stage, next follow-up date, and notes.</p>
+      <p>CSV is best for viewing data in Google Sheets or Excel. JSON backup is best for restoring the app exactly.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>Autosave</h3>
+      <p>The app autosaves into browser storage after changes, periodically, and before closing the page. The autosave badge shows the most recent save time.</p>
+      <p>Autosave protects normal work, but it does not replace backups. If someone clears browser data, local app data can be deleted.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: Where is my data stored?</h3>
+      <p>Your data is stored inside your browser using local storage. It is private to that browser unless you export and share a backup file.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: Can other people see my leads?</h3>
+      <p>No. If someone else opens the hosted app link, they get their own fresh version in their own browser. They cannot see your leads.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: What happens if I close the browser?</h3>
+      <p>Your data should still be there when you reopen the app in the same browser. Use Save Backup regularly for extra safety.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: What if I use another laptop or phone?</h3>
+      <p>Your data will not automatically appear on another device. Use Save Backup on the first device, then Restore on the second device.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: Can I host this on my domain?</h3>
+      <p>Yes. Rename the file to <strong>index.html</strong>, upload it to a static host like Netlify or GitHub Pages, and connect your custom domain.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: Is this a CRM?</h3>
+      <p>It is a lightweight outreach operating system. It is simpler than a full CRM, but stronger than a normal spreadsheet for daily manual outreach.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: Does it send DMs or emails automatically?</h3>
+      <p>No. This app tracks and guides outreach. You still send the messages manually on Instagram or email. This helps keep the workflow simple and safer.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: What should I do every day?</h3>
+      <ol>
+        <li>Open the app.</li>
+        <li>Check the Next Action Engine.</li>
+        <li>Complete due follow-ups first.</li>
+        <li>Send new outreach until the progress bar is complete.</li>
+        <li>Update reply buttons when people respond.</li>
+        <li>Save a backup every few days.</li>
+      </ol>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: Why do I see the same lead in Instagram and Email mode?</h3>
+      <p>If a lead has both Instagram and email, it can appear in both modes. The app warns you if the lead was already contacted on the other channel.</p>
+    </div>
+
+    <div class="guide-card">
+      <h3>FAQ: How do duplicates work?</h3>
+      <p>The app tries to skip duplicates by checking the strongest available identifier: email, Instagram, website, or name.</p>
+    </div>
+  </div>
+</section>
+<section id="tab-completed"
+<section id="tab-completed" style="display:none"><div style="overflow:auto"><table id="completedTable"></table></div></section>
+<section id="tab-skipped" style="display:none"><div style="overflow:auto"><table id="skippedTable"></table></div></section>
+<section id="tab-settings" style="display:none"><div class="metrics"><div class="metric"><div class="label">Name / Business Name</div><input id="profileNameInput" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Niche</div><input id="nicheInput" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Instagram Enabled</div><select id="instagramEnabled" style="width:100%;padding:12px;margin-top:10px"><option value="off">Off</option><option value="on">On</option></select></div><div class="metric"><div class="label">Instagram Goal</div><input id="igGoalInput" type="number" min="0" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Email Enabled</div><select id="emailEnabled" style="width:100%;padding:12px;margin-top:10px"><option value="off">Off</option><option value="on">On</option></select></div><div class="metric"><div class="label">Email Goal</div><input id="emailGoalInput" type="number" min="0" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Sound Effects</div><select id="soundToggle" style="width:100%;padding:12px;margin-top:10px"><option value="on">On</option><option value="off">Off</option></select></div></div><div style="height:14px"></div><button id="saveSettings" class="primary">Save Settings</button></section>
+</div></main></div><footer class="footer"><div>Powered by <strong>AK Reliance</strong> · Created by <strong>Aaryyan Bhut</strong>, Founder</div><div>© <span id="copyrightYear"></span> AK Reliance. All rights reserved.</div></footer></div>
+
+<div class="welcome-backdrop" id="welcomeModal"><div class="welcome"><div class="welcome-logo" id="welcomeLogo">OS</div><h2>ENTER OUTREACH DASHBOARD</h2><div class="small-note">Set up your workspace once. Your goals, leads, scripts, and progress stay inside your browser unless you export a backup.</div><div style="margin-top:16px;display:grid;gap:12px"><label class="metric" style="min-height:auto"><div class="label">Your Name or Business Name</div><input id="onboardUserName" placeholder="Your Agency / Business Name" style="margin-top:10px"></label><label class="metric" style="min-height:auto"><div class="label">Your Niche</div><input id="onboardNiche" placeholder="Auto detailing, landscape lighting, real estate..." style="margin-top:10px"></label><div class="metric" style="min-height:auto"><div class="label">Instagram Outreach</div><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><select id="onboardInstagramEnabled" style="width:110px;padding:10px"><option value="off">Off</option><option value="on">On</option></select><input id="onboardInstagramGoal" type="number" min="0" value="40" style="width:100px;padding:10px"><span class="small-note">per day</span></div></div><div class="metric" style="min-height:auto"><div class="label">Email Outreach</div><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><select id="onboardEmailEnabled" style="width:110px;padding:10px"><option value="off">Off</option><option value="on">On</option></select><input id="onboardEmailGoal" type="number" min="0" value="20" style="width:100px;padding:10px"><span class="small-note">per day</span></div></div><div class="metric" style="min-height:auto"><div class="label">Sound Effects</div><select id="onboardSound" style="width:160px;padding:10px;margin-top:10px"><option value="on">On</option><option value="off">Off</option></select></div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button id="startWelcome" class="primary">Save & Start</button></div></div></div>
+<div class="celebration-backdrop" id="celebrationModal"><div class="celebration"><h2>Done for today.</h2><div class="small-note">Daily new outreach target completed. Export a backup or unlock another batch when ready.</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button id="closeCelebration">Close</button><button id="celebrateMore" class="success">Show More Leads</button></div></div></div>
+<div class="modal-backdrop" id="pasteModal"><div class="modal"><h2>Paste CSV</h2><div class="small-note">Use headers like Name, Website, Email, Instagram, Phone, Notes, Channel</div><textarea id="csvText" style="width:100%;min-height:210px;padding:14px" placeholder="Name,Website,Email,Instagram,Phone,Channel"></textarea><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button id="closePaste">Cancel</button><button id="importPaste" class="primary">Import</button></div></div></div>
+<div class="modal-backdrop" id="leadModal"><div class="modal"><h2 id="leadModalTitle">Add Lead</h2><input type="hidden" id="leadId"><div class="row"><input id="leadName" placeholder="Business name"><input id="leadWebsite" placeholder="Website"><input id="leadEmail" placeholder="Email"><input id="leadInstagram" placeholder="Instagram"><input id="leadPhone" placeholder="Phone"><select id="leadChannel"><option>Instagram</option><option>Email</option></select></div><textarea id="leadNotes" placeholder="Notes" style="width:100%;min-height:100px;padding:12px;margin-top:10px"></textarea><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button id="closeLead">Cancel</button><button id="saveLead" class="primary">Save Lead</button></div></div></div>
+<div class="modal-backdrop" id="notesModal"><div class="modal"><h2>Lead Notes</h2><input type="hidden" id="notesLeadId"><textarea id="notesText" style="width:100%;min-height:180px;padding:12px"></textarea><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button id="closeNotes">Cancel</button><button id="saveNotes" class="primary">Save Notes</button></div></div></div>
+<div class="modal-backdrop" id="scriptModal"><div class="modal"><h2 id="scriptModalTitle">Add Script</h2><input type="hidden" id="scriptId"><div class="row"><input id="scriptNiche" placeholder="Niche"><input id="scriptStage" placeholder="Stage"></div><textarea id="scriptMessage" style="width:100%;min-height:190px;padding:12px;margin-top:10px"></textarea><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button id="closeScript">Cancel</button><button id="saveScript" class="primary">Save Script</button></div></div></div>
+
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <h2 id="deleteTitle">Delete lead?</h2>
+    <div class="small-note" id="deleteMessage">This cannot be undone.</div>
+    <div class="delete-modal-actions">
+      <button id="cancelDelete">Cancel</button>
+      <button class="danger" id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="floatingSelectionBar" class="floating-selection">
+  <span id="floatingSelectionText">0 selected</span>
+  <button class="danger" id="floatingDeleteBtn">Delete</button>
+  <button id="floatingClearBtn">Clear</button>
+</div>
+
+
+<div class="modal-backdrop" id="cloudAuthModal">
+  <div class="modal">
+    <h2>Cloud Sync Login</h2>
+    <div class="small-note">Sign in to sync your dashboard across laptop, phone, and browser.</div>
+    <div class="row">
+      <input id="cloudEmail" type="email" placeholder="Email address">
+      <input id="cloudPassword" type="password" placeholder="Password">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;">
+      <button id="closeCloudAuth">Cancel</button>
+      <button id="cloudSignup" class="primary">Create Account</button>
+      <button id="cloudLogin" class="primary">Log In</button>
+    </div>
+  </div>
+</div>
+<div class="cloud-status-panel" id="cloudStatusPanel">
+  <span id="cloudStatusText">Local mode</span>
+  <button id="openCloudAuth">Cloud Login</button>
+  <button id="cloudSyncNow" style="display:none;">Sync Now</button>
+  <button id="cloudLogout" class="danger" style="display:none;">Logout</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE="akReliance.outreachOS.realFinal";const replyStatuses=["Replied","Interested","Not Interested","Call Booked","Client","Lost","Do Not Contact"];const stopStatuses=new Set(["Interested","Not Interested","Call Booked","Client","Lost","Do Not Contact"]);const followupDelays=[2,5,7,10];let state=loadState(),expandedId=null,selectedIds=new Set(),pendingDelete=null;
+function defaultState(){return{settings:{userName:"",niche:"",igEnabled:false,emailEnabled:false,igGoal:0,emailGoal:0,mode:"Instagram",extraBatches:0,lastActiveDate:todayKey(),sound:"on",hasSeenWelcome:false},stats:{streak:0,bestStreak:0,lastCompletedGoalDate:""},leads:[],skipped:[],scripts:[{id:1,niche:"Auto Detailing",stage:"First DM",message:"Add your first DM script here."},{id:2,niche:"Landscape Lighting",stage:"Follow-up 1",message:"Add your follow-up script here."}],nextId:1,nextScriptId:3}}
+function loadState(){try{const p=JSON.parse(localStorage.getItem(STORE)||"null");if(!p)return defaultState();const b=defaultState();return{...b,...p,settings:{...b.settings,...(p.settings||{})},stats:{...b.stats,...(p.stats||{})},scripts:Array.isArray(p.scripts)?p.scripts:b.scripts}}catch{return defaultState()}}function saveState(){
+  state.meta = state.meta || {};
+  state.meta.lastSavedAt = new Date().toISOString();
+  localStorage.setItem(STORE,JSON.stringify(state));
+  updateAutosaveBadge("saving");
+  clearTimeout(window.__autosaveTimer);
+  window.__autosaveTimer = setTimeout(()=>updateAutosaveBadge("saved"),650);
+}
+function updateAutosaveBadge(mode){
+  const el=document.getElementById("autosaveBadge");
+  if(!el)return;
+  const last=state.meta&&state.meta.lastSavedAt?new Date(state.meta.lastSavedAt):null;
+  if(mode==="saving"){
+    el.classList.add("saving");
+    el.textContent="Saving...";
+  }else{
+    el.classList.remove("saving");
+    el.textContent=last?`Autosaved ${last.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}`:"Autosaved";
+  }
+}
+function todayKey(d=new Date()){const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}function resetDailyIfNeeded(){const t=todayKey();if(state.settings.lastActiveDate!==t){state.settings.lastActiveDate=t;state.settings.extraBatches=0;saveState()}}
+function clean(v){return String(v||"").trim()}function cleanPhone(v){return clean(v).replace(/[^\d+]/g,"")}function fixWebsite(v){let s=clean(v);if(!s||s.includes("@")||s.includes("instagram.com"))return"";if(!/^https?:\/\//i.test(s))s="https://"+s;return s}function fixInstagram(v){let s=clean(v);if(!s)return"";if(s.startsWith("@"))return"https://instagram.com/"+s.slice(1);if(s.includes("instagram.com")&&!/^https?:\/\//i.test(s))return"https://"+s;if(!s.includes("instagram.com"))return"https://instagram.com/"+s;return s}
+function displayName(){return clean(state.settings.userName)||"Your Dashboard"}function initialsFromName(n){const p=clean(n).split(/\s+/).filter(Boolean);return !p.length?"OS":p.length===1?p[0].slice(0,2).toUpperCase():(p[0][0]+p[1][0]).toUpperCase()}
+function goalBase(){return(state.settings.igEnabled?Number(state.settings.igGoal||0):0)+(state.settings.emailEnabled?Number(state.settings.emailGoal||0):0)}function goal(){return goalBase()*(1+Number(state.settings.extraBatches||0))}function currentMode(){return state.settings.mode || defaultChannel()}function isConfigured(c){return c==="Instagram"?!!state.settings.igEnabled:c==="Email"?!!state.settings.emailEnabled:true}function hasChannelContact(l,ch){return ch==="Instagram"?!!l.instagramSent:ch==="Email"?!!l.emailSent:false}function hasChannelInfo(l,ch){return ch==="Instagram"?!!l.instagram:ch==="Email"?!!l.email:true}
+function todayNewCompleted(){const t=todayKey();return state.leads.filter(l=>l.lastActionDate===t&&l.followupStage===1&&hasChannelContact(l,currentMode())).length}function todayCompletedAll(){const t=todayKey();return state.leads.filter(l=>l.done&&l.lastActionDate===t).length}
+function eligibleFollowups(){return state.leads.filter(l=>!stopStatuses.has(l.replyStatus)&&!l.done&&l.todayAction==="FOLLOW UP TODAY")}function eligibleNew(){const r=Math.max(goal()-todayNewCompleted(),0);return r<=0?[]:state.leads.filter(l=>!stopStatuses.has(l.replyStatus)&&l.status==="New"&&hasChannelInfo(l,currentMode())&&!hasChannelContact(l,currentMode())).slice(0,r)}
+function defaultChannel(){return state.settings.igEnabled?"Instagram":state.settings.emailEnabled?"Email":"Instagram"}function makeLead(d){return{id:state.nextId++,name:d.name||"",website:d.website||"",email:d.email||"",instagram:d.instagram||"",phone:d.phone||"",status:"New",channel:d.channel||defaultChannel(),done:false,lastActionDate:"",followupStage:0,nextFollowupDate:"",todayAction:"",replyStatus:"No Reply",instagramSent:false,emailSent:false,notes:d.notes||"",sample:!!d.sample,createdAt:new Date().toISOString()}}
+function parseCSV(text){const rows=[];let row=[],cell="",q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c=='"'&&q&&n=='"'){cell+='"';i++}else if(c=='"')q=!q;else if(c==","&&!q){row.push(cell);cell=""}else if((c=="\n"||c=="\r")&&!q){if(c=="\r"&&n=="\n")i++;row.push(cell);rows.push(row);row=[];cell=""}else cell+=c}row.push(cell);rows.push(row);return rows.map(r=>r.map(c=>c.trim())).filter(r=>r.some(Boolean))}
+function norm(v){return String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"")}function findHeader(h,n){return h.findIndex(x=>n.includes(x))}function leadKey(l){return clean(l.email||l.instagram||l.website||l.name).toLowerCase()}
+function importRows(rows){if(rows.length<2){toast("No CSV rows found.");return}const h=rows[0].map(norm),idx={name:findHeader(h,["name","businessname","company","companyname","business","title"]),website:findHeader(h,["website","site","url","externalurl"]),email:findHeader(h,["email","businessemail","mail"]),instagram:findHeader(h,["instagram","insta","ig","profile","profileurl","instagramurl"]),phone:findHeader(h,["phone","phonenumber","businessphone","mobile"]),notes:findHeader(h,["notes","note"]),channel:findHeader(h,["channel","outreachchannel","type"])};if(idx.name===-1){toast("CSV needs Name / Business Name.");return}const ex=new Set(state.leads.map(leadKey));let add=0,skip=0;rows.slice(1).forEach(r=>{const l=makeLead({name:clean(r[idx.name]),website:fixWebsite(idx.website>-1?r[idx.website]:""),email:clean(idx.email>-1?r[idx.email]:""),instagram:fixInstagram(idx.instagram>-1?r[idx.instagram]:""),phone:cleanPhone(idx.phone>-1?r[idx.phone]:""),notes:clean(idx.notes>-1?r[idx.notes]:""),channel:clean(idx.channel>-1?r[idx.channel]:"")||defaultChannel()});const k=leadKey(l);if(!l.name){state.skipped.push({reason:"Missing name",raw:r.join(" | "),date:new Date().toISOString()});skip++;return}if(ex.has(k)){state.skipped.push({reason:"Duplicate",name:l.name,email:l.email,raw:r.join(" | "),date:new Date().toISOString()});skip++;return}ex.add(k);state.leads.push(l);add++});saveState();render();toast(`Imported ${add}. Skipped ${skip}.`)}
+function completeLead(id,el){const l=state.leads.find(x=>x.id===id);if(!l)return;if(el)el.closest(".lead-card")?.classList.add("completing");setTimeout(()=>{const t=todayKey(),mode=currentMode();if(mode==="Instagram")l.instagramSent=true;if(mode==="Email")l.emailSent=true;l.done=true;l.channel=mode;l.lastActionDate=t;l.status=l.followupStage===0?`${mode} Contacted`:`${mode} Follow-up Sent`;if(l.followupStage>=followupDelays.length){l.status=`Final ${mode} Follow-up Sent`;l.todayAction="";l.nextFollowupDate=""}else{const n=new Date();n.setDate(n.getDate()+followupDelays[l.followupStage]);l.followupStage++;l.nextFollowupDate=todayKey(n);l.todayAction="Not Yet"}whoosh();saveState();render();updateStreak();toast("Outreach complete.")},el?210:0)}
+function whoosh(){if(state.settings.sound!=="on")return;try{const c=new(window.AudioContext||window.webkitAudioContext)(),dur=.22,noise=c.createBufferSource(),buf=c.createBuffer(1,c.sampleRate*dur,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);noise.buffer=buf;const f=c.createBiquadFilter();f.type="bandpass";f.frequency.setValueAtTime(900,c.currentTime);f.frequency.exponentialRampToValueAtTime(2200,c.currentTime+dur);const g=c.createGain();g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.045,c.currentTime+.03);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+dur);noise.connect(f);f.connect(g);g.connect(c.destination);noise.start();noise.stop(c.currentTime+dur)}catch{}}
+function updateStreak(){const comp=todayNewCompleted(),g=goalBase(),t=todayKey();if(g&&comp>=g&&state.stats.lastCompletedGoalDate!==t){const y=new Date();y.setDate(y.getDate()-1);state.stats.streak=state.stats.lastCompletedGoalDate===todayKey(y)?state.stats.streak+1:1;state.stats.bestStreak=Math.max(state.stats.bestStreak||0,state.stats.streak);state.stats.lastCompletedGoalDate=t;saveState();document.getElementById("celebrationModal").style.display="flex"}}
+function setStatus(id,s){const l=state.leads.find(x=>x.id===id);if(!l)return;l.replyStatus=s;if(stopStatuses.has(s)){l.todayAction="";l.nextFollowupDate="";l.status=s}saveState();render();toast(`${s} saved.`)}
+function refreshFollowups(){const t=todayKey();state.leads.forEach(l=>{if(stopStatuses.has(l.replyStatus))return;if(l.nextFollowupDate&&l.nextFollowupDate<=t){l.done=false;l.todayAction="FOLLOW UP TODAY";l.status="Follow-up Due"}});saveState();render();toast("Follow-ups refreshed.")}
+function nextAction(){const fu=eligibleFollowups()[0];if(fu)return{type:"followup",lead:fu,title:`Follow up with ${fu.name}`,sub:`This is follow-up ${fu.followupStage}. Open the lead, send the follow-up, then mark Done.`};const nw=eligibleNew()[0];if(nw)return{type:"new",lead:nw,title:`Send outreach to ${nw.name}`,sub:`Open the lead, contact them on ${currentMode()}, then mark Done.`};return{title:"Nothing urgent right now",sub:todayNewCompleted()>=goal()?"Daily target complete. Unlock more leads if you want.":"Import or add new leads to continue."}}
+function renderNext(){const n=nextAction();document.getElementById("nextTitle").textContent=n.title;document.getElementById("nextSub").textContent=n.sub;document.getElementById("nextActions").innerHTML=n.lead?`<button class="action-primary" onclick="openLeadFromNext(${n.lead.id})">Open Lead</button><button class="action-primary" onclick="completeLead(${n.lead.id},this)">Done</button>`:`<button class="primary" onclick="showTab('leads')">View Leads</button>`}
+function renderCard(l,i,type){const exp=expandedId===l.id,stage=type==="followup"?`Follow-up ${l.followupStage}`:l.status;const mode=currentMode(),other=mode==="Instagram"?"Email":"Instagram",warn=hasChannelContact(l,other)?`<div class="channel-warning">Already contacted on ${other}</div>`:"";return`<div class="lead-card ${exp?"expanded":""} ${selectedIds.has(l.id)?"selected":""}" onclick="toggleExpand(event,${l.id})"><div class="select-box"><input class="lead-check" type="checkbox" onclick="event.stopPropagation();toggleSelect(${l.id},this.checked)" ${selectedIds.has(l.id)?"checked":""}><div class="rank">${i+1}</div></div><div><div class="lead-name">${esc(l.name)}</div><div class="lead-meta">${l.website?`<a class="link-pill" onclick="event.stopPropagation()" href="${esc(l.website)}" target="_blank">Website</a>`:""}${l.instagram?`<a class="link-pill" onclick="event.stopPropagation()" href="${esc(l.instagram)}" target="_blank">Instagram</a>`:""}${l.email?`<span class="pill">${esc(l.email)}</span>`:""}${l.phone?`<span class="pill">${esc(l.phone)}</span>`:""}<span class="pill">Mode: ${esc(mode)}</span><span class="pill">${esc(stage)}</span></div>${warn}</div><div class="card-actions"><button class="action-primary" onclick="event.stopPropagation();completeLead(${l.id},this)">Done</button></div><div class="expanded-panel"><div class="small-note"><strong>Notes:</strong> ${esc(l.notes)||"No notes yet."}</div><div class="action-row"><button class="reply-btn" onclick="event.stopPropagation();setStatus(${l.id},'Replied')">Replied</button><button class="reply-btn hot" onclick="event.stopPropagation();setStatus(${l.id},'Interested')">Interested</button><button class="reply-btn" onclick="event.stopPropagation();setStatus(${l.id},'Not Interested')">Not Interested</button><button class="reply-btn hot" onclick="event.stopPropagation();setStatus(${l.id},'Call Booked')">Call Booked</button><button class="reply-btn win" onclick="event.stopPropagation();setStatus(${l.id},'Client')">Client</button><button class="reply-btn" onclick="event.stopPropagation();setStatus(${l.id},'Lost')">Lost</button><button class="reply-btn danger" onclick="event.stopPropagation();setStatus(${l.id},'Do Not Contact')">DNC</button><button onclick="event.stopPropagation();openNotes(${l.id})">Notes</button><button onclick="event.stopPropagation();openEditLead(${l.id})">Edit</button></div></div></div>`}
+function toggleExpand(e,id){if(e.target.tagName==="BUTTON"||e.target.tagName==="A"||e.target.tagName==="SELECT")return;expandedId=expandedId===id?null:id;render()}
+function renderAction(){const q=document.getElementById("searchAction").value.toLowerCase(),f=document.getElementById("actionFilter").value;let fu=eligibleFollowups(),nw=eligibleNew();if(q){fu=fu.filter(l=>JSON.stringify(l).toLowerCase().includes(q));nw=nw.filter(l=>JSON.stringify(l).toLowerCase().includes(q))}document.getElementById("followupList").innerHTML=f!=="new"?(fu.length?fu.map((l,i)=>renderCard(l,i,"followup")).join(""):`<div class="empty">No follow-ups due.</div>`):`<div class="empty">Follow-ups hidden.</div>`;document.getElementById("newLeadList").innerHTML=f!=="followup"?(nw.length?nw.map((l,i)=>renderCard(l,i,"new")).join(""):`<div class="empty">${todayNewCompleted()>=goal()?"Done for today. Unlock more leads if needed.":"No new leads available."}</div>`):`<div class="empty">New leads hidden.</div>`}
+function renderDash(){const total=state.leads.length,sent=state.leads.filter(l=>l.done).length,replies=state.leads.filter(l=>l.replyStatus==="Replied").length,interested=state.leads.filter(l=>l.replyStatus==="Interested").length,calls=state.leads.filter(l=>l.replyStatus==="Call Booked").length,clients=state.leads.filter(l=>l.replyStatus==="Client").length,fu=eligibleFollowups().length,comp=todayNewCompleted(),g=goal(),pct=Math.min(100,g?comp/g*100:0),fuDone=state.leads.filter(l=>l.done&&l.lastActionDate===todayKey()&&l.followupStage>1).length,fuTotal=fu+fuDone,fuPct=fuTotal?fuDone/fuTotal*100:0;["mTotal","mSent","mReplies","mInterested","mCalls","mClients"].forEach((id,i)=>document.getElementById(id).textContent=[total,sent,replies,interested,calls,clients][i]);document.getElementById("mReplyRate").textContent=total?Math.round(((replies+interested+calls+clients)/total)*100)+"%":"0%";document.getElementById("mSkipped").textContent=state.skipped.length;document.getElementById("mStreak").textContent=state.stats.streak||0;document.getElementById("mBestStreak").textContent=state.stats.bestStreak||0;document.getElementById("dailyText").textContent=`${comp} / ${g}`;document.getElementById("dailyBar").style.width=pct+"%";document.getElementById("followupText").textContent=`${fuDone} / ${fuTotal}`;document.getElementById("followupBar").style.width=fuPct+"%";document.getElementById("doneToday").style.display=g&&comp>=g?"block":"none";const name=displayName(),rem=Math.max(g-comp,0),msg=g&&comp>=g?"Daily outreach is complete.":`${rem} outreach actions left today.`;document.getElementById("welcomeLine").textContent=`Welcome, ${name}`;document.getElementById("workspaceName").textContent=name;document.getElementById("userInitials").textContent=initialsFromName(name);document.getElementById("dailyNotice").querySelector("div").innerHTML=`<strong>Today:</strong> ${msg}${fu?` ${fu} follow-up${fu===1?"":"s"} due.`:""}`;document.getElementById("cStatus").textContent=g&&comp>=g?"Complete":"Active";document.getElementById("cRemaining").textContent=rem;document.getElementById("cFollowups").textContent=fu;document.getElementById("profileNameInput").value=state.settings.userName;document.getElementById("nicheInput").value=state.settings.niche;document.getElementById("instagramEnabled").value=state.settings.igEnabled?"on":"off";document.getElementById("emailEnabled").value=state.settings.emailEnabled?"on":"off";document.getElementById("igGoalInput").value=state.settings.igGoal;document.getElementById("emailGoalInput").value=state.settings.emailGoal;document.getElementById("soundToggle").value=state.settings.sound;document.querySelectorAll(".mode-pill").forEach(b=>b.classList.toggle("active",b.dataset.mode===currentMode()));document.getElementById("modeTitle").textContent=`${currentMode()} Mode`;document.getElementById("modeHint").textContent=`Only leads with ${currentMode()==="Instagram"?"Instagram profiles":"email addresses"} appear in this mode.`;document.getElementById("removeSampleBtn").style.display=state.leads.some(l=>l.sample||String(l.name).startsWith("Sample -"))?"inline-block":"none";updateBulkButton()}
+function tableHtml(h,r){if(!r.length)return`<tr><td><div class="empty">Nothing to show yet.</div></td></tr>`;return`<thead><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${r.map(row=>`<tr>${row.map(c=>`<td>${c||""}</td>`).join("")}</tr>`).join("")}</tbody>`}
+function link(label,url){return url?`<a class="link-pill" href="${esc(url)}" target="_blank">${label}</a>`:""}function esc(s){return String(s||"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
+function renderTables(){const q=document.getElementById("searchAll").value.toLowerCase();let leads=[...state.leads];if(q)leads=leads.filter(l=>JSON.stringify(l).toLowerCase().includes(q));document.getElementById("leadsTable").innerHTML=tableHtml(["ID","Business","Channel","Website","Instagram","Email","Status","Reply","Next","Actions"],leads.map(l=>[l.id,esc(l.name),esc(l.channel),link("Website",l.website),link("Instagram",l.instagram),esc(l.email),esc(l.status),esc(l.replyStatus),esc(l.nextFollowupDate),`<button onclick="openEditLead(${l.id})">Edit</button> <button onclick="openNotes(${l.id})">Notes</button> <button class="danger" onclick="requestDelete(${l.id})">Delete</button>`]));const hot=state.leads.filter(l=>["Interested","Call Booked","Client"].includes(l.replyStatus));document.getElementById("hotTable").innerHTML=tableHtml(["ID","Business","Website","Instagram","Email","Reply","Notes"],hot.map(l=>[l.id,esc(l.name),link("Website",l.website),link("Instagram",l.instagram),esc(l.email),esc(l.replyStatus),esc(l.notes)]));const comp=state.leads.filter(l=>l.done&&l.lastActionDate).sort((a,b)=>(b.lastActionDate||"").localeCompare(a.lastActionDate||""));document.getElementById("completedTable").innerHTML=tableHtml(["Date","ID","Business","Website","Instagram","Email","Stage","Reply"],comp.map(l=>[esc(l.lastActionDate),l.id,esc(l.name),link("Website",l.website),link("Instagram",l.instagram),esc(l.email),l.followupStage,esc(l.replyStatus)]));document.getElementById("skippedTable").innerHTML=tableHtml(["Date","Reason","Name","Email","Raw"],state.skipped.map(x=>[esc((x.date||"").slice(0,10)),esc(x.reason),esc(x.name),esc(x.email),esc(x.raw)]));renderScripts()}
+function renderScripts(){const niches=[...new Set(state.scripts.map(s=>s.niche).filter(Boolean))],sel=document.getElementById("scriptNicheFilter"),cur=sel.value||"all";sel.innerHTML=`<option value="all">All niches</option>`+niches.map(n=>`<option ${cur===n?"selected":""}>${esc(n)}</option>`).join("");const scripts=cur==="all"?state.scripts:state.scripts.filter(s=>s.niche===cur);document.getElementById("scriptsTable").innerHTML=tableHtml(["Niche","Stage","Message","Actions"],scripts.map(s=>[esc(s.niche),esc(s.stage),esc(s.message),`<button onclick="copyScript(${s.id})">Copy</button> <button onclick="openEditScript(${s.id})">Edit</button> <button class="danger" onclick="deleteScript(${s.id})">Delete</button>`]))}
+function render(){resetDailyIfNeeded();renderNext();renderDash();renderAction();renderTables()}
+function showTab(t){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));["action","leads","hot","scripts","guide","completed","skipped","settings"].forEach(x=>document.getElementById(`tab-${x}`).style.display=x===t?"block":"none")}
+function openLeadFromNext(id){
+  expandedId = id;
+  showTab("action");
+  render();
+  setTimeout(()=>{
+    const card = document.querySelector(`.lead-card[data-id="${id}"]`);
+    if(card){
+      card.scrollIntoView({behavior:"smooth", block:"center"});
+      card.classList.add("focused-lead");
+      setTimeout(()=>card.classList.remove("focused-lead"), 3200);
+      toast("Lead opened.");
+    } else {
+      toast("Lead is not visible in this mode.");
+    }
+  }, 80);
+}
+function exportBackup(){const b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`outreach-dashboard-backup-${todayKey()}.json`;a.click();URL.revokeObjectURL(a.href);state.meta=state.meta||{};state.meta.lastBackupAt=new Date().toISOString();saveState();toast("Backup saved.")}
+function exportCSV(){const h=["ID","Name","Website","Email","Instagram","Phone","Current Channel","Instagram Sent","Email Sent","Status","Reply","Done","Last Action","Stage","Next Follow-up","Notes"],rows=state.leads.map(l=>[l.id,l.name,l.website,l.email,l.instagram,l.phone,l.channel,l.instagramSent,l.emailSent,l.status,l.replyStatus,l.done,l.lastActionDate,l.followupStage,l.nextFollowupDate,l.notes]),csv=[h,...rows].map(r=>r.map(c=>{const s=String(c??"");return/[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s}).join(",")).join("\n"),blob=new Blob([csv],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`outreach-dashboard-leads-${todayKey()}.csv`;a.click();URL.revokeObjectURL(a.href);toast("CSV exported.")}
+function restoreBackup(f){const r=new FileReader();r.onload=()=>{try{const p=JSON.parse(r.result);if(!Array.isArray(p.leads))throw Error();state={...defaultState(),...p,settings:{...defaultState().settings,...(p.settings||{})},stats:{...defaultState().stats,...(p.stats||{})},scripts:Array.isArray(p.scripts)?p.scripts:defaultState().scripts};saveState();render();toast("Backup restored.")}catch{toast("Invalid backup.")}};r.readAsText(f)}
+function openAddLead(){document.getElementById("leadModalTitle").textContent="Add Lead";document.getElementById("leadId").value="";["leadName","leadWebsite","leadEmail","leadInstagram","leadPhone","leadNotes"].forEach(id=>document.getElementById(id).value="");document.getElementById("leadChannel").value=defaultChannel();document.getElementById("leadModal").style.display="flex"}function openEditLead(id){const l=state.leads.find(x=>x.id===id);if(!l)return;document.getElementById("leadModalTitle").textContent="Edit Lead";document.getElementById("leadId").value=l.id;document.getElementById("leadName").value=l.name;document.getElementById("leadWebsite").value=l.website;document.getElementById("leadEmail").value=l.email;document.getElementById("leadInstagram").value=l.instagram;document.getElementById("leadPhone").value=l.phone;document.getElementById("leadChannel").value=l.channel;document.getElementById("leadNotes").value=l.notes;document.getElementById("leadModal").style.display="flex"}
+function saveLeadModal(){const id=Number(document.getElementById("leadId").value),data={name:clean(document.getElementById("leadName").value),website:fixWebsite(document.getElementById("leadWebsite").value),email:clean(document.getElementById("leadEmail").value),instagram:fixInstagram(document.getElementById("leadInstagram").value),phone:cleanPhone(document.getElementById("leadPhone").value),channel:document.getElementById("leadChannel").value,notes:clean(document.getElementById("leadNotes").value)};if(!data.name){toast("Business name required.");return}if(id){const l=state.leads.find(x=>x.id===id);if(l)Object.assign(l,data)}else state.leads.push(makeLead(data));saveState();document.getElementById("leadModal").style.display="none";render();toast(id?"Lead updated.":"Lead added.")}
+function openNotes(id){const l=state.leads.find(x=>x.id===id);if(!l)return;document.getElementById("notesLeadId").value=id;document.getElementById("notesText").value=l.notes||"";document.getElementById("notesModal").style.display="flex"}function saveNotes(){const id=Number(document.getElementById("notesLeadId").value),l=state.leads.find(x=>x.id===id);if(l){l.notes=document.getElementById("notesText").value;saveState();render();toast("Notes saved.")}document.getElementById("notesModal").style.display="none"}function requestDelete(ids){pendingDelete=Array.isArray(ids)?ids:[ids];document.getElementById("deleteTitle").textContent=pendingDelete.length>1?`Delete ${pendingDelete.length} leads?`:"Delete this lead?";document.getElementById("deleteMessage").textContent="This cannot be undone. The selected lead data will be permanently removed from this browser.";document.getElementById("deleteModal").style.display="flex"}function confirmDeleteNow(){if(!pendingDelete)return;const set=new Set(pendingDelete);state.leads=state.leads.filter(l=>!set.has(l.id));selectedIds.clear();pendingDelete=null;document.getElementById("deleteModal").style.display="none";saveState();render();toast("Deleted.")}function deleteLead(id){requestDelete(id)}function toggleSelect(id,checked){checked?selectedIds.add(id):selectedIds.delete(id);render();updateBulkButton()}function updateBulkButton(){const topBtn=document.getElementById("bulkDeleteBtn");const float=document.getElementById("floatingSelectionBar");const text=document.getElementById("floatingSelectionText");if(topBtn){topBtn.style.display=selectedIds.size?"inline-block":"none";topBtn.textContent=`Delete Selected (${selectedIds.size})`}if(!float||!text)return;text.textContent=`${selectedIds.size} selected`;float.classList.toggle("show",selectedIds.size>0);if(selectedIds.size){const checked=document.querySelector(".lead-check:checked");if(checked&&window.innerWidth>720){const r=checked.getBoundingClientRect();float.style.left=Math.min(window.innerWidth-170,Math.max(170,r.left+170))+"px";float.style.top=Math.min(window.innerHeight-80,Math.max(90,r.top+20))+"px";float.style.bottom="auto";}else{float.style.left="50%";float.style.top="auto";float.style.bottom="26px";}}}function clearSelection(){selectedIds.clear();render();updateBulkButton()}
+function openAddScript(){document.getElementById("scriptModalTitle").textContent="Add Script";document.getElementById("scriptId").value="";document.getElementById("scriptNiche").value=state.settings.niche||"";document.getElementById("scriptStage").value="";document.getElementById("scriptMessage").value="";document.getElementById("scriptModal").style.display="flex"}function openEditScript(id){const s=state.scripts.find(x=>x.id===id);if(!s)return;document.getElementById("scriptModalTitle").textContent="Edit Script";document.getElementById("scriptId").value=s.id;document.getElementById("scriptNiche").value=s.niche;document.getElementById("scriptStage").value=s.stage;document.getElementById("scriptMessage").value=s.message;document.getElementById("scriptModal").style.display="flex"}function saveScriptModal(){const id=Number(document.getElementById("scriptId").value),d={niche:clean(document.getElementById("scriptNiche").value),stage:clean(document.getElementById("scriptStage").value),message:document.getElementById("scriptMessage").value};if(!d.niche||!d.stage||!d.message){toast("Niche, stage, and message required.");return}if(id){const s=state.scripts.find(x=>x.id===id);if(s)Object.assign(s,d)}else state.scripts.push({id:state.nextScriptId++,...d});saveState();render();document.getElementById("scriptModal").style.display="none";toast("Script saved.")}async function copyScript(id){const s=state.scripts.find(x=>x.id===id);if(!s)return;try{await navigator.clipboard.writeText(s.message);toast("Script copied.")}catch{toast("Copy failed.")}}function deleteScript(id){if(!confirm("Delete this script?"))return;state.scripts=state.scripts.filter(s=>s.id!==id);saveState();render();toast("Script deleted.")}
+function loadSampleData(){const sample=[["Sample - Bright Auto Spa","brightautospa.com","hello@brightautospa.com","@brightautospa","+1 214 555 0191","Instagram"],["Sample - Elite Shine Studio","eliteshinestudio.com","team@eliteshinestudio.com","@eliteshinestudio","+1 480 555 0144","Instagram"],["Sample - Luxe Landscape Lighting","luxelandscapelighting.com","info@luxelighting.com","@luxelandscapelighting","+1 713 555 0118","Email"],["Sample - NightGlow Outdoor","nightglowoutdoor.com","hello@nightglowoutdoor.com","@nightglowoutdoor","+1 512 555 0172","Instagram"]];sample.forEach(r=>state.leads.push(makeLead({name:r[0],website:fixWebsite(r[1]),email:r[2],instagram:fixInstagram(r[3]),phone:r[4],channel:r[5],notes:"Sample data",sample:true})));if(!state.settings.igEnabled&&!state.settings.emailEnabled){state.settings.igEnabled=true;state.settings.igGoal=40}saveState();render();toast("Sample data loaded.")}
+function removeSampleData(){state.leads=state.leads.filter(l=>!l.sample&&!String(l.name).startsWith("Sample -"));saveState();render();toast("Sample data removed.")}
+function showWelcomeIfNeeded(){if(!state.settings.hasSeenWelcome||!state.settings.userName){document.getElementById("onboardUserName").value=state.settings.userName||"";document.getElementById("onboardNiche").value=state.settings.niche||"";document.getElementById("welcomeLogo").textContent=initialsFromName(state.settings.userName||"OS");document.getElementById("welcomeModal").style.display="flex"}}
+function saveOnboarding(){state.settings.userName=clean(document.getElementById("onboardUserName").value)||"Your Dashboard";state.settings.niche=clean(document.getElementById("onboardNiche").value);state.settings.igEnabled=document.getElementById("onboardInstagramEnabled").value==="on";state.settings.igGoal=Math.max(0,Number(document.getElementById("onboardInstagramGoal").value||0));state.settings.emailEnabled=document.getElementById("onboardEmailEnabled").value==="on";state.settings.emailGoal=Math.max(0,Number(document.getElementById("onboardEmailGoal").value||0));state.settings.sound=document.getElementById("onboardSound").value;state.settings.mode=state.settings.igEnabled?"Instagram":state.settings.emailEnabled?"Email":"Instagram";state.settings.hasSeenWelcome=true;saveState();document.getElementById("welcomeModal").style.display="none";render()}
+function init(){document.getElementById("copyrightYear").textContent=new Date().getFullYear();resetDailyIfNeeded();document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));document.getElementById("refreshBtn").onclick=refreshFollowups;document.querySelectorAll(".mode-pill").forEach(b=>b.onclick=()=>{state.settings.mode=b.dataset.mode;saveState();render();toast(`${b.dataset.mode} mode active.`)});document.getElementById("bulkDeleteBtn").onclick=()=>requestDelete([...selectedIds]);document.getElementById("floatingDeleteBtn").onclick=()=>requestDelete([...selectedIds]);document.getElementById("floatingClearBtn").onclick=clearSelection;document.getElementById("cancelDelete").onclick=()=>{pendingDelete=null;document.getElementById("deleteModal").style.display="none"};document.getElementById("confirmDelete").onclick=confirmDeleteNow;document.getElementById("moreBtn").onclick=()=>{state.settings.extraBatches++;saveState();render();toast("Another batch unlocked.")};document.getElementById("exportJsonBtn").onclick=exportBackup;document.getElementById("exportCsvBtn").onclick=exportCSV;document.getElementById("sampleBtn").onclick=loadSampleData;document.getElementById("removeSampleBtn").onclick=removeSampleData;document.getElementById("csvFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>importRows(parseCSV(r.result));r.readAsText(f);e.target.value=""};document.getElementById("backupFile").onchange=e=>{const f=e.target.files[0];if(f)restoreBackup(f);e.target.value=""};document.getElementById("manualImportBtn").onclick=()=>document.getElementById("pasteModal").style.display="flex";document.getElementById("closePaste").onclick=()=>document.getElementById("pasteModal").style.display="none";document.getElementById("importPaste").onclick=()=>{importRows(parseCSV(document.getElementById("csvText").value));document.getElementById("csvText").value="";document.getElementById("pasteModal").style.display="none"};document.getElementById("addLeadBtn").onclick=openAddLead;document.getElementById("closeLead").onclick=()=>document.getElementById("leadModal").style.display="none";document.getElementById("saveLead").onclick=saveLeadModal;document.getElementById("closeNotes").onclick=()=>document.getElementById("notesModal").style.display="none";document.getElementById("saveNotes").onclick=saveNotes;document.getElementById("addScriptBtn").onclick=openAddScript;document.getElementById("closeScript").onclick=()=>document.getElementById("scriptModal").style.display="none";document.getElementById("saveScript").onclick=saveScriptModal;document.getElementById("scriptNicheFilter").onchange=renderScripts;document.getElementById("searchAction").oninput=renderAction;document.getElementById("actionFilter").onchange=renderAction;document.getElementById("searchAll").oninput=renderTables;document.getElementById("saveSettings").onclick=()=>{state.settings.userName=clean(document.getElementById("profileNameInput").value);state.settings.niche=clean(document.getElementById("nicheInput").value);state.settings.igEnabled=document.getElementById("instagramEnabled").value==="on";state.settings.igGoal=Math.max(0,Number(document.getElementById("igGoalInput").value||0));state.settings.emailEnabled=document.getElementById("emailEnabled").value==="on";state.settings.emailGoal=Math.max(0,Number(document.getElementById("emailGoalInput").value||0));state.settings.sound=document.getElementById("soundToggle").value;saveState();render();toast("Settings saved.")};document.getElementById("resetBtn").onclick=()=>{if(!confirm("This deletes all app data in this browser. Export backup first if needed. Continue?"))return;state=defaultState();saveState();render();showWelcomeIfNeeded();toast("Reset complete.")};document.getElementById("dismissNotice").onclick=()=>document.getElementById("dailyNotice").style.display="none";document.getElementById("startWelcome").onclick=saveOnboarding;document.getElementById("closeCelebration").onclick=()=>document.getElementById("celebrationModal").style.display="none";document.getElementById("celebrateMore").onclick=()=>{document.getElementById("celebrationModal").style.display="none";state.settings.extraBatches++;saveState();render()};render();updateAutosaveBadge("saved");setInterval(()=>{saveState();},30000);window.addEventListener("beforeunload",()=>{try{saveState()}catch(e){}});showWelcomeIfNeeded()}
+init();
+</script>
+
+<script id="violet-lightning-js">
+(function(){
+  const canvas = document.getElementById("lightningCanvas");
+  const aura = document.getElementById("cursorAura");
+  if (!canvas || !aura) return;
+
+  const ctx = canvas.getContext("2d");
+  let w, h, dpr;
+  let mouse = { x: window.innerWidth * .62, y: window.innerHeight * .22 };
+  let bolts = [];
+  let lastBolt = 0;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.width = Math.floor(window.innerWidth * dpr);
+    h = canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function makeBolt(){
+    const startX = mouse.x + (Math.random() - .5) * 220;
+    const startY = mouse.y + (Math.random() - .5) * 120;
+    const length = 120 + Math.random() * 230;
+    const angle = (-25 + Math.random() * 50) * Math.PI / 180;
+    const points = [{x:startX, y:startY}];
+
+    let x = startX, y = startY;
+    const segments = 7 + Math.floor(Math.random()*7);
+    for(let i=1;i<=segments;i++){
+      x += Math.cos(angle) * (length / segments) + (Math.random() - .5) * 34;
+      y += Math.sin(angle) * (length / segments) + (Math.random() - .5) * 34;
+      points.push({x,y});
+    }
+
+    bolts.push({
+      points,
+      life: 1,
+      width: 1 + Math.random() * 1.7,
+      hue: Math.random() > .35 ? "violet" : "blue"
+    });
+
+    if (bolts.length > 8) bolts.shift();
+  }
+
+  function drawBolt(b){
+    ctx.save();
+    ctx.globalAlpha = Math.max(b.life, 0);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    const color = b.hue === "violet" ? "167,139,250" : "56,189,248";
+
+    ctx.shadowColor = `rgba(${color}, .95)`;
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = `rgba(${color}, .58)`;
+    ctx.lineWidth = b.width + 2.2;
+    ctx.beginPath();
+    b.points.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+    ctx.stroke();
+
+    ctx.shadowBlur = 4;
+    ctx.strokeStyle = `rgba(255,255,255,.62)`;
+    ctx.lineWidth = Math.max(.7, b.width * .55);
+    ctx.beginPath();
+    b.points.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+    ctx.stroke();
+
+    // small branches
+    if (b.life > .55) {
+      for(let i=1;i<b.points.length-1;i+=3){
+        if(Math.random() > .55) continue;
+        const p = b.points[i];
+        ctx.strokeStyle = `rgba(${color}, .34)`;
+        ctx.lineWidth = .8;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.moveTo(p.x,p.y);
+        ctx.lineTo(p.x + (Math.random()-.5)*70, p.y + (Math.random()-.5)*70);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function loop(t){
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+
+    if (t - lastBolt > 900 + Math.random()*900) {
+      makeBolt();
+      lastBolt = t;
+    }
+
+    bolts.forEach(b => {
+      drawBolt(b);
+      b.life -= .025;
+    });
+    bolts = bolts.filter(b => b.life > 0);
+
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener("resize", resize);
+  window.addEventListener("mousemove", e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    aura.style.left = e.clientX + "px";
+    aura.style.top = e.clientY + "px";
+  }, { passive: true });
+
+  window.addEventListener("mouseleave", () => aura.style.opacity = ".25");
+  window.addEventListener("mouseenter", () => aura.style.opacity = ".75");
+
+  resize();
+  aura.style.left = mouse.x + "px";
+  aura.style.top = mouse.y + "px";
+  requestAnimationFrame(loop);
+
+  let sparkLast = 0;
+  window.addEventListener("mousemove", e => {
+    const now = performance.now();
+    if (now - sparkLast < 55) return;
+    sparkLast = now;
+    const spark = document.createElement("div");
+    spark.className = "cursor-spark";
+    spark.style.left = (e.clientX + (Math.random() - .5) * 18) + "px";
+    spark.style.top = (e.clientY + (Math.random() - .5) * 18) + "px";
+    spark.style.setProperty("--rot", ((Math.random() * 120) - 60) + "deg");
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 460);
+  }, { passive: true });
+
+})();
+</script>
+
+
+
+<script id="final-cursor-lightning-fibers-js">
+(function(){
+  let last = 0;
+  let lastX = window.innerWidth / 2;
+  let lastY = window.innerHeight / 2;
+
+  function makeFiber(x, y, vx, vy){
+    const speed = Math.min(1, (Math.abs(vx) + Math.abs(vy)) / 45);
+    if (speed < .12 && Math.random() > .25) return;
+
+    const angle = Math.atan2(vy || 0.1, vx || 0.1) * 180 / Math.PI;
+    const fiber = document.createElement("div");
+    fiber.className = "cursor-fiber";
+    fiber.style.left = (x + 3 + (Math.random() - .5) * 5) + "px";
+    fiber.style.top = (y - 16 + (Math.random() - .5) * 5) + "px";
+    fiber.style.setProperty("--rot", (angle + (Math.random() * 34 - 17)) + "deg");
+    fiber.style.setProperty("--dx", (Math.random() * 14 - 5) + "px");
+    fiber.style.setProperty("--dy", (Math.random() * 14 - 7) + "px");
+
+    const p1 = `0,22`;
+    const p2 = `${12+Math.random()*8},${15+Math.random()*11}`;
+    const p3 = `${27+Math.random()*8},${18+Math.random()*8}`;
+    const p4 = `${43+Math.random()*9},${10+Math.random()*14}`;
+    const p5 = `${62+Math.random()*10},${15+Math.random()*12}`;
+
+    fiber.innerHTML = `
+      <svg viewBox="0 0 78 42" aria-hidden="true">
+        <polyline points="${p1} ${p2} ${p3} ${p4} ${p5}"
+          stroke="rgba(196,181,253,.62)" stroke-width="1.35" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="${p1} ${p2} ${p3} ${p4} ${p5}"
+          stroke="rgba(139,92,246,.32)" stroke-width="3.8" fill="none"
+          stroke-linecap="round" stroke-linejoin="round" opacity=".24"/>
+      </svg>`;
+    document.body.appendChild(fiber);
+    setTimeout(()=>fiber.remove(), 380);
+  }
+
+  window.addEventListener("mousemove", e => {
+    const now = performance.now();
+    const vx = e.clientX - lastX;
+    const vy = e.clientY - lastY;
+
+    if (now - last > 85) {
+      makeFiber(e.clientX, e.clientY, vx, vy);
+      last = now;
+    }
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+  }, { passive: true });
+})();
+</script>
+
+
+<script src="cloud-sync.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+    });
+  }
+</script>
+
+
+<script id="red-welcome-upgrade-js">
+(function(){
+ const canvas=document.getElementById("redLightningCanvas"); if(!canvas)return; const ctx=canvas.getContext("2d"); let w,h,dpr,bolts=[],last=0;
+ function resize(){dpr=Math.min(devicePixelRatio||1,2); w=innerWidth; h=innerHeight; canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+"px"; canvas.style.height=h+"px"; ctx.setTransform(dpr,0,0,dpr,0,0)}
+ function makeBolt(){const sx=Math.random()>.45?w+30:-30,sy=Math.random()*h*.35,ex=Math.random()*w,ey=h*.15+Math.random()*h*.55,pts=[],segs=10+Math.floor(Math.random()*8); for(let i=0;i<=segs;i++){const t=i/segs;pts.push({x:sx+(ex-sx)*t+(Math.random()-.5)*42,y:sy+(ey-sy)*t+(Math.random()-.5)*42})} bolts.push({pts,life:1,width:1.5+Math.random()*2.4,branches:Math.random()>.2}); if(bolts.length>6)bolts.shift()}
+ function draw(b){ctx.save();ctx.globalAlpha=Math.max(0,b.life);ctx.lineCap="round";ctx.lineJoin="round";ctx.shadowColor="rgba(255,7,58,.95)";ctx.shadowBlur=28;ctx.strokeStyle="rgba(255,7,58,.72)";ctx.lineWidth=b.width+3.5;ctx.beginPath();b.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.shadowBlur=6;ctx.strokeStyle="rgba(255,220,220,.75)";ctx.lineWidth=Math.max(.8,b.width*.55);ctx.beginPath();b.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke(); if(b.branches&&b.life>.35){for(let i=2;i<b.pts.length-2;i+=3){const p=b.pts[i];ctx.shadowBlur=18;ctx.strokeStyle="rgba(255,7,58,.45)";ctx.lineWidth=.9;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+(Math.random()-.5)*120,p.y+(Math.random()-.5)*90);ctx.stroke()}}ctx.restore()}
+ function loop(t){ctx.clearRect(0,0,w,h); if(t-last>1400+Math.random()*1200){makeBolt();last=t} bolts.forEach(b=>{draw(b);b.life-=.018}); bolts=bolts.filter(b=>b.life>0); requestAnimationFrame(loop)}
+ function glitch(target){const el=target||document.querySelector(".app"); if(el){el.classList.remove("glitch-hit");void el.offsetWidth;el.classList.add("glitch-hit");setTimeout(()=>el.classList.remove("glitch-hit"),420)} const f=document.createElement("div");f.className="glitch-flash";document.body.appendChild(f);setTimeout(()=>f.remove(),260)}
+ window.akGlitch=glitch; document.addEventListener("click",e=>{const t=e.target,txt=(t&&t.textContent||"").toLowerCase(); if(txt.includes("done")||txt.includes("close")||txt.includes("cancel")||txt.includes("save & start")||txt.includes("delete")) setTimeout(()=>glitch(t.closest(".modal,.welcome,.celebration,.panel,.next-action")||document.querySelector(".app")),40)},true);
+ resize(); addEventListener("resize",resize); requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>

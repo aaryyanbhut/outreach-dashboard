@@ -747,13 +747,306 @@ h1{
   .welcome h2{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",Inter,system-ui,sans-serif!important;text-transform:uppercase!important;letter-spacing:.015em!important;font-size:clamp(44px,6.4vw,86px)!important;line-height:.86!important;margin-top:6px!important;background:linear-gradient(90deg,#fff 0%,#ffe4e6 28%,#ff073a 55%,#ffb4b4 76%,#fff 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;filter:drop-shadow(0 0 28px rgba(255,7,58,.46)) drop-shadow(0 10px 18px rgba(0,0,0,.72))}
 </style>
 
+
+<style id="profile-raid-gate-upgrade">
+  /* Hide the old cloud strip completely; controls are mirrored into Profile */
+  #cloudStatusPanel {
+    position: fixed !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    top: -9999px !important;
+    left: -9999px !important;
+  }
+
+  /* Main top buttons cleanup */
+  .topbar .controls #exportJsonBtn,
+  .topbar .controls #exportCsvBtn,
+  .topbar .controls label[for="backupFile"],
+  .topbar .controls #resetBtn,
+  .topbar .controls .autosave-badge {
+    display: none !important;
+  }
+
+  .topbar .controls {
+    align-items: center;
+  }
+
+  .profile-cloud-dot {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: #64748b;
+    border: 2px solid #020617;
+    box-shadow: 0 0 18px rgba(148,163,184,.55);
+    z-index: 5;
+  }
+
+  .profile-cloud-dot.synced {
+    background: #22c55e;
+    box-shadow: 0 0 20px rgba(34,197,94,.85);
+  }
+
+  .profile-cloud-dot.local {
+    background: #a78bfa;
+    box-shadow: 0 0 20px rgba(167,139,250,.72);
+  }
+
+  .logo {
+    cursor: pointer !important;
+    position: relative !important;
+  }
+
+  .logo:hover {
+    transform: translateY(-1px) scale(1.018);
+    box-shadow: 0 0 62px rgba(139,92,246,.38), inset 0 0 35px rgba(139,92,246,.18) !important;
+  }
+
+  .profile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 140;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 34px 18px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background:
+      radial-gradient(circle at 50% 12%, rgba(139,92,246,.22), transparent 34%),
+      rgba(0,0,0,.78);
+    backdrop-filter: blur(20px) brightness(.50) saturate(1.25);
+    -webkit-backdrop-filter: blur(20px) brightness(.50) saturate(1.25);
+  }
+
+  .profile-backdrop.show {
+    display: flex;
+  }
+
+  .profile-card {
+    margin: auto 0;
+    width: min(960px, calc(100vw - 34px));
+    max-height: calc(100svh - 68px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 38px;
+    position: relative;
+    isolation: isolate;
+    padding: 26px;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(167,139,250,.36), transparent 31%),
+      radial-gradient(circle at 12% 18%, rgba(139,92,246,.24), transparent 23%),
+      radial-gradient(circle at 88% 14%, rgba(56,189,248,.14), transparent 24%),
+      linear-gradient(145deg, rgba(4,0,12,.98), rgba(15,5,36,.96) 48%, rgba(2,4,14,.98));
+    border: 1px solid rgba(167,139,250,.72);
+    box-shadow:
+      0 54px 180px rgba(0,0,0,.86),
+      0 0 120px rgba(139,92,246,.32),
+      inset 0 0 24px rgba(255,255,255,.05),
+      inset 0 0 84px rgba(139,92,246,.16);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(167,139,250,.82) rgba(10,0,20,.70);
+  }
+
+  .profile-card::-webkit-scrollbar { width: 10px; }
+  .profile-card::-webkit-scrollbar-track { background: rgba(10,0,20,.72); border-radius: 999px; }
+  .profile-card::-webkit-scrollbar-thumb { background: rgba(167,139,250,.82); border-radius: 999px; }
+
+  .profile-card::before {
+    content: "";
+    position: absolute;
+    inset: -22px;
+    z-index: -2;
+    border-radius: 50px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(167,139,250,.46), transparent 35%),
+      conic-gradient(from 180deg at 50% 50%,
+        transparent 0deg,
+        rgba(139,92,246,.38) 42deg,
+        transparent 82deg,
+        rgba(56,189,248,.13) 138deg,
+        transparent 215deg,
+        rgba(167,139,250,.30) 292deg,
+        transparent 360deg);
+    filter: blur(18px);
+    animation: profileGateAura 4.8s ease-in-out infinite alternate;
+    opacity: .98;
+  }
+
+  @keyframes profileGateAura {
+    0% { transform: scale(1) rotate(-1deg); opacity: .76; }
+    100% { transform: scale(1.035) rotate(1deg); opacity: 1; }
+  }
+
+  .profile-lightning-canvas {
+    position: absolute;
+    inset: -80px;
+    width: calc(100% + 160px);
+    height: calc(100% + 160px);
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: screen;
+    opacity: 1;
+  }
+
+  .profile-card > *:not(.profile-lightning-canvas) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .profile-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .profile-title {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Inter, system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .015em;
+    font-size: clamp(38px, 5.8vw, 76px);
+    line-height: .88;
+    margin: 0;
+    background:
+      linear-gradient(90deg, #ffffff 0%, #ddd6fe 28%, #8b5cf6 55%, #bae6fd 78%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter:
+      drop-shadow(0 0 28px rgba(139,92,246,.48))
+      drop-shadow(0 10px 18px rgba(0,0,0,.72));
+  }
+
+  .profile-subtitle {
+    color: rgba(221,214,254,.84);
+    font-size: 13px;
+    font-weight: 750;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .profile-close {
+    border-color: rgba(167,139,250,.55) !important;
+    background: rgba(10,0,20,.60) !important;
+  }
+
+  .profile-identity {
+    display: grid;
+    grid-template-columns: 104px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 18px;
+    border-radius: 28px;
+    background:
+      linear-gradient(145deg, rgba(20,0,38,.82), rgba(3,7,18,.74));
+    border: 1px solid rgba(167,139,250,.28);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+    margin-bottom: 16px;
+  }
+
+  .profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 32px;
+    display: grid;
+    place-items: center;
+    font-weight: 950;
+    font-size: 30px;
+    color: #fff;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(255,255,255,.16), transparent 19%),
+      radial-gradient(circle, rgba(139,92,246,.50), rgba(25,0,55,.88) 65%);
+    border: 1px solid rgba(167,139,250,.88);
+    box-shadow:
+      0 0 50px rgba(139,92,246,.46),
+      0 0 96px rgba(56,189,248,.10),
+      inset 0 0 32px rgba(139,92,246,.20);
+    text-shadow: 0 0 18px rgba(167,139,250,.95);
+  }
+
+  .profile-name {
+    font-size: 25px;
+    font-weight: 950;
+    letter-spacing: -.045em;
+  }
+
+  .profile-meta {
+    color: rgba(203,213,225,.78);
+    margin-top: 6px;
+    line-height: 1.55;
+  }
+
+  .profile-status-pill {
+    display: inline-flex;
+    margin-top: 10px;
+    padding: 8px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(167,139,250,.34);
+    background: rgba(15,23,42,.54);
+    color: #ddd6fe;
+    font-weight: 850;
+    font-size: 12px;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 12px;
+  }
+
+  .profile-section {
+    padding: 17px;
+    border-radius: 26px;
+    background:
+      linear-gradient(145deg, rgba(20,0,38,.76), rgba(3,7,18,.68));
+    border: 1px solid rgba(167,139,250,.22);
+  }
+
+  .profile-section h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    letter-spacing: -.02em;
+  }
+
+  .profile-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .profile-actions button,
+  .profile-actions .file-label {
+    border-color: rgba(167,139,250,.38) !important;
+  }
+
+  .profile-actions .primary {
+    background: linear-gradient(135deg, rgba(139,92,246,.48), rgba(56,189,248,.18)) !important;
+    border-color: rgba(167,139,250,.72) !important;
+    box-shadow: 0 0 30px rgba(139,92,246,.22) !important;
+  }
+
+  @media(max-width:720px){
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-identity { grid-template-columns: 1fr; }
+    .profile-head { flex-direction: column; }
+  }
+</style>
+
 </head>
 <body>
 <div id="cursorCore"></div>
 <canvas id="lightningCanvas"></canvas>
 <div id="cursorAura"></div>
 <div class="app">
-<div class="topbar"><div class="brand"><div class="logo"><span id="userInitials">OS</span></div><div><h1>Outreach Dashboard</h1><div class="subtitle" id="welcomeLine">Welcome</div></div></div><div class="controls"><label class="file-label primary" for="csvFile">Import CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button class="primary" id="manualImportBtn">Paste CSV</button><button id="sampleBtn">Load Sample</button><button id="removeSampleBtn" style="display:none">Remove Sample</button><button id="addLeadBtn">Add Lead</button><button class="danger" id="bulkDeleteBtn" style="display:none">Delete Selected</button><button id="exportJsonBtn">Save Backup</button><button id="exportCsvBtn">Export CSV</button><label class="file-label" for="backupFile">Restore</label><input id="backupFile" type="file" accept=".json,application/json"><button class="danger" id="resetBtn">Reset</button><div class="autosave-badge" id="autosaveBadge">Autosaved</div></div></div>
+<div class="topbar"><div class="brand"><div class="logo" id="profileLauncher" title="Open profile"><span id="userInitials">OS</span><span class="profile-cloud-dot local" id="profileCloudDot"></span></div><div><h1>Outreach Dashboard</h1><div class="subtitle" id="welcomeLine">Welcome</div></div></div><div class="controls"><label class="file-label primary" for="csvFile">Import CSV</label><input id="csvFile" type="file" accept=".csv,text/csv"><button class="primary" id="manualImportBtn">Paste CSV</button><button id="sampleBtn">Load Sample</button><button id="removeSampleBtn" style="display:none">Remove Sample</button><button id="addLeadBtn">Add Lead</button><button class="danger" id="bulkDeleteBtn" style="display:none">Delete Selected</button><button id="exportJsonBtn">Save Backup</button><button id="exportCsvBtn">Export CSV</button><label class="file-label" for="backupFile">Restore</label><input id="backupFile" type="file" accept=".json,application/json"><button class="danger" id="resetBtn">Reset</button><div class="autosave-badge" id="autosaveBadge">Autosaved</div></div></div>
 <div class="notice" id="dailyNotice"><div><strong>Today:</strong> Loading...</div><button id="dismissNotice" class="ghost">Hide</button></div>
 <section class="hero-split">
   <div class="next-action next-action-left">
@@ -1141,6 +1434,65 @@ h1{
   <button id="cloudLogout" class="danger" style="display:none;">Logout</button>
 </div>
 
+
+<div class="profile-backdrop" id="profileModal">
+  <div class="profile-card">
+    <canvas class="profile-lightning-canvas" id="profileLightningCanvas"></canvas>
+    <div class="profile-head">
+      <div>
+        <h2 class="profile-title">Profile</h2>
+        <div class="profile-subtitle">Cloud sync · backups · workspace controls</div>
+      </div>
+      <button class="profile-close" id="closeProfile">Close</button>
+    </div>
+
+    <div class="profile-identity">
+      <div class="profile-avatar" id="profileAvatar">OS</div>
+      <div>
+        <div class="profile-name" id="profileDisplayName">Your Dashboard</div>
+        <div class="profile-meta" id="profileDisplayMeta">Workspace settings and cloud controls.</div>
+        <div class="profile-status-pill" id="profileCloudStatus">Local mode</div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-section">
+        <h3>Cloud Account</h3>
+        <div class="profile-actions">
+          <button class="primary" id="profileCloudLogin">Cloud Login</button>
+          <button id="profileSyncNow">Sync Now</button>
+          <button class="danger" id="profileLogout">Logout</button>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>Data & Backup</h3>
+        <div class="profile-actions">
+          <button id="profileSaveBackup">Save Backup</button>
+          <button id="profileExportCsv">Export CSV</button>
+          <label class="file-label" for="backupFile">Restore Backup</label>
+          <button class="danger" id="profileReset">Reset App</button>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>Settings</h3>
+        <div class="profile-actions">
+          <button id="profileOpenSettings">Open Settings</button>
+          <button id="profileOpenGuide">Open Guide</button>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>System</h3>
+        <div class="small-note">
+          Main actions stay on the dashboard. Account, cloud sync, export, restore, and reset live here.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1446,6 +1798,125 @@ init();
     resize(); addEventListener("resize",resize); if(window.ResizeObserver)new ResizeObserver(resize).observe(welcome); requestAnimationFrame(loop);
   }
   addEventListener("load",setupWelcomeLightning); document.addEventListener("click",()=>setTimeout(setupWelcomeLightning,60),true); setTimeout(setupWelcomeLightning,500);
+})();
+</script>
+
+
+<script id="profile-raid-gate-js">
+(function(){
+  function qs(id){return document.getElementById(id)}
+  function clickIfExists(id){const el=qs(id); if(el) el.click();}
+  function getDisplayNameSafe(){
+    try { return (typeof displayName === "function" ? displayName() : (window.state?.settings?.userName || "Your Dashboard")); }
+    catch(e){ return "Your Dashboard"; }
+  }
+  function getInitialsSafe(name){
+    try { return (typeof initialsFromName === "function" ? initialsFromName(name) : name.split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase()); }
+    catch(e){ return "OS"; }
+  }
+  function updateProfileVisuals(){
+    const name = getDisplayNameSafe();
+    const niche = window.state?.settings?.niche || "No niche selected";
+    const cloudText = qs("cloudStatusText")?.textContent || "Local mode";
+    const avatar = qs("profileAvatar");
+    const display = qs("profileDisplayName");
+    const meta = qs("profileDisplayMeta");
+    const status = qs("profileCloudStatus");
+    const dot = qs("profileCloudDot");
+
+    if(avatar) avatar.textContent = getInitialsSafe(name);
+    if(display) display.textContent = name;
+    if(meta) meta.textContent = `Niche: ${niche}`;
+    if(status) status.textContent = cloudText;
+
+    if(dot){
+      const isCloud = /cloud/i.test(cloudText) && !/config|local/i.test(cloudText);
+      dot.classList.toggle("synced", isCloud);
+      dot.classList.toggle("local", !isCloud);
+    }
+  }
+
+  function openProfile(){
+    updateProfileVisuals();
+    const modal = qs("profileModal");
+    if(modal) {
+      modal.classList.add("show");
+      setupProfileLightning();
+    }
+  }
+  function closeProfile(){
+    qs("profileModal")?.classList.remove("show");
+  }
+
+  function setupProfileLightning(){
+    const card = document.querySelector(".profile-card");
+    const canvas = qs("profileLightningCanvas");
+    if(!card || !canvas || canvas.dataset.ready) return;
+    canvas.dataset.ready = "1";
+    const ctx = canvas.getContext("2d");
+    let w=0,h=0,dpr=1,bolts=[],lastStrike=0;
+
+    function resize(){
+      const r=card.getBoundingClientRect();
+      dpr=Math.min(window.devicePixelRatio||1,2);
+      w=Math.max(1,r.width+160); h=Math.max(1,r.height+160);
+      canvas.width=Math.floor(w*dpr); canvas.height=Math.floor(h*dpr);
+      canvas.style.width=w+"px"; canvas.style.height=h+"px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    function bp(s){
+      if(s===0)return{x:Math.random()*w,y:20+Math.random()*40};
+      if(s===1)return{x:w-20-Math.random()*40,y:Math.random()*h};
+      if(s===2)return{x:Math.random()*w,y:h-20-Math.random()*40};
+      return{x:20+Math.random()*40,y:Math.random()*h};
+    }
+    function makeBolt(heavy=false){
+      const side=Math.floor(Math.random()*4),start=bp(side),end=bp((side+1+Math.floor(Math.random()*3))%4);
+      const pts=[],segs=heavy?15:9+Math.floor(Math.random()*7);
+      for(let i=0;i<=segs;i++){
+        const t=i/segs;
+        pts.push({x:start.x+(end.x-start.x)*t+(Math.random()-.5)*(heavy?50:34),y:start.y+(end.y-start.y)*t+(Math.random()-.5)*(heavy?50:34)});
+      }
+      bolts.push({points:pts,life:1,width:heavy?2.4+Math.random()*1.5:1.3+Math.random()*1.3,heavy,branches:2+Math.floor(Math.random()*4)});
+      if(bolts.length>10) bolts.shift();
+    }
+    function draw(b){
+      ctx.save(); ctx.globalAlpha=Math.max(0,b.life); ctx.lineCap="round"; ctx.lineJoin="round";
+      ctx.shadowColor="rgba(167,139,250,.98)"; ctx.shadowBlur=b.heavy?34:22;
+      ctx.strokeStyle=b.heavy?"rgba(167,139,250,.78)":"rgba(139,92,246,.58)";
+      ctx.lineWidth=b.width+(b.heavy?5.5:3.8); ctx.beginPath();
+      b.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.stroke();
+      ctx.shadowBlur=8; ctx.strokeStyle="rgba(245,243,255,.82)"; ctx.lineWidth=Math.max(.8,b.width*.52); ctx.beginPath();
+      b.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.stroke();
+      if(b.life>.42){for(let k=0;k<b.branches;k++){const idx=1+Math.floor(Math.random()*(b.points.length-2)),p=b.points[idx],a=Math.random()*Math.PI*2,len=28+Math.random()*(b.heavy?82:50); ctx.shadowBlur=18; ctx.strokeStyle="rgba(139,92,246,.54)"; ctx.lineWidth=b.heavy?1.1:.8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x+Math.cos(a)*len,p.y+Math.sin(a)*len); ctx.stroke();}}
+      ctx.restore();
+    }
+    function loop(t){
+      ctx.clearRect(0,0,w,h);
+      if(Math.random()>.90) makeBolt(false);
+      if(t-lastStrike>1200+Math.random()*1300){makeBolt(true); if(Math.random()>.55)setTimeout(()=>makeBolt(true),90); lastStrike=t;}
+      bolts.forEach(b=>{draw(b); b.life-=b.heavy?.026:.020});
+      bolts=bolts.filter(b=>b.life>0);
+      requestAnimationFrame(loop);
+    }
+    resize(); window.addEventListener("resize",resize); if(window.ResizeObserver)new ResizeObserver(resize).observe(card); requestAnimationFrame(loop);
+  }
+
+  window.addEventListener("load", function(){
+    const logo = qs("profileLauncher") || document.querySelector(".logo");
+    if(logo) logo.addEventListener("click", openProfile);
+    qs("closeProfile")?.addEventListener("click", closeProfile);
+    qs("profileCloudLogin")?.addEventListener("click", ()=>clickIfExists("openCloudAuth"));
+    qs("profileSyncNow")?.addEventListener("click", ()=>clickIfExists("cloudSyncNow"));
+    qs("profileLogout")?.addEventListener("click", ()=>clickIfExists("cloudLogout"));
+    qs("profileSaveBackup")?.addEventListener("click", ()=>clickIfExists("exportJsonBtn"));
+    qs("profileExportCsv")?.addEventListener("click", ()=>clickIfExists("exportCsvBtn"));
+    qs("profileReset")?.addEventListener("click", ()=>clickIfExists("resetBtn"));
+    qs("profileOpenSettings")?.addEventListener("click", ()=>{ closeProfile(); if(typeof showTab==="function") showTab("settings"); });
+    qs("profileOpenGuide")?.addEventListener("click", ()=>{ closeProfile(); if(typeof showTab==="function") showTab("guide"); });
+    setInterval(updateProfileVisuals, 1200);
+    updateProfileVisuals();
+  });
 })();
 </script>
 

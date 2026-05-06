@@ -675,6 +675,44 @@ h1{
 </style>
 
 
+
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070011">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Outreach Dashboard">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+
+
+<style id="cloud-sync-styles-restored">
+  .cloud-status-panel {
+    position: fixed;
+    right: 18px;
+    top: 18px;
+    z-index: 999;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: min(520px, calc(100vw - 36px));
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(15,23,42,.94), rgba(10,10,24,.90));
+    border: 1px solid rgba(255,7,58,.36);
+    box-shadow: 0 18px 70px rgba(0,0,0,.35), 0 0 30px rgba(255,7,58,.14);
+    backdrop-filter: blur(14px);
+  }
+  .cloud-status-panel span { color:#fecaca; font-size:12px; font-weight:900; padding:0 6px; }
+  .cloud-status-panel button { padding:8px 10px !important; font-size:12px; }
+  @media(max-width:720px){
+    .cloud-status-panel{left:12px; right:12px; top:auto; bottom:12px; border-radius:22px; justify-content:center;}
+  }
+</style>
+
+
 <style id="raid-gate-welcome-final">
   .welcome-backdrop {
     align-items: flex-start !important;
@@ -682,13 +720,10 @@ h1{
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
     padding: 34px 18px !important;
-    background:
-      radial-gradient(circle at 50% 10%, rgba(255, 0, 48, .20), transparent 36%),
-      rgba(0,0,0,.84) !important;
+    background: radial-gradient(circle at 50% 10%, rgba(255, 0, 48, .20), transparent 36%), rgba(0,0,0,.84) !important;
     backdrop-filter: blur(22px) brightness(.48) saturate(1.25) !important;
     -webkit-backdrop-filter: blur(22px) brightness(.48) saturate(1.25) !important;
   }
-
   .welcome {
     margin: auto 0 !important;
     width: min(1040px, calc(100vw - 34px)) !important;
@@ -698,154 +733,18 @@ h1{
     border-radius: 38px !important;
     isolation: isolate !important;
     position: relative !important;
-    background:
-      radial-gradient(circle at 50% -8%, rgba(255, 24, 55, .38), transparent 30%),
-      radial-gradient(circle at 12% 18%, rgba(255, 0, 72, .24), transparent 22%),
-      radial-gradient(circle at 88% 14%, rgba(255, 44, 44, .24), transparent 24%),
-      linear-gradient(145deg, rgba(3,0,7,.98), rgba(20,0,8,.96) 48%, rgba(3,4,12,.98)) !important;
+    background: radial-gradient(circle at 50% -8%, rgba(255, 24, 55, .38), transparent 30%), radial-gradient(circle at 12% 18%, rgba(255, 0, 72, .24), transparent 22%), radial-gradient(circle at 88% 14%, rgba(255, 44, 44, .24), transparent 24%), linear-gradient(145deg, rgba(3,0,7,.98), rgba(20,0,8,.96) 48%, rgba(3,4,12,.98)) !important;
     border: 1px solid rgba(255, 37, 68, .80) !important;
-    box-shadow:
-      0 54px 180px rgba(0,0,0,.86),
-      0 0 120px rgba(255, 7, 58, .34),
-      0 0 24px rgba(255, 255, 255, .05) inset,
-      0 0 80px rgba(255, 7, 58, .20) inset !important;
+    box-shadow: 0 54px 180px rgba(0,0,0,.86), 0 0 120px rgba(255, 7, 58, .34), 0 0 24px rgba(255, 255, 255, .05) inset, 0 0 80px rgba(255, 7, 58, .20) inset !important;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 35, 65, .85) rgba(12, 0, 8, .72);
   }
-
-  .welcome::-webkit-scrollbar { width: 10px; }
-  .welcome::-webkit-scrollbar-track { background: rgba(12,0,8,.72); border-radius: 999px; }
-  .welcome::-webkit-scrollbar-thumb { background: rgba(255,35,65,.85); border-radius: 999px; }
-
-  .welcome::before {
-    content: "";
-    position: absolute;
-    inset: -22px;
-    z-index: -2;
-    border-radius: 50px;
-    background:
-      radial-gradient(circle at 50% 0%, rgba(255, 7, 58, .50), transparent 35%),
-      conic-gradient(from 180deg at 50% 50%,
-        transparent 0deg,
-        rgba(255, 7, 58, .35) 42deg,
-        transparent 82deg,
-        rgba(255, 60, 60, .22) 138deg,
-        transparent 215deg,
-        rgba(255, 7, 58, .30) 292deg,
-        transparent 360deg);
-    filter: blur(18px);
-    animation: raidGateAura 4.8s ease-in-out infinite alternate;
-    opacity: .98;
-  }
-
-  .welcome::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    border-radius: inherit;
-    background:
-      linear-gradient(118deg, transparent 0 28%, rgba(255,255,255,.06) 29%, transparent 31%),
-      linear-gradient(56deg, transparent 0 62%, rgba(255,7,58,.15) 63%, transparent 65%),
-      repeating-linear-gradient(0deg, rgba(255,7,58,.045) 0 1px, transparent 1px 8px);
-    opacity: .86;
-    mix-blend-mode: screen;
-  }
-
-  @keyframes raidGateAura {
-    0% { transform: scale(1) rotate(-1deg); opacity: .78; }
-    100% { transform: scale(1.035) rotate(1deg); opacity: 1; }
-  }
-
-  .welcome-lightning-canvas {
-    position: absolute;
-    inset: -80px;
-    width: calc(100% + 160px);
-    height: calc(100% + 160px);
-    pointer-events: none;
-    z-index: 0;
-    mix-blend-mode: screen;
-    opacity: 1;
-  }
-
-  .welcome > *:not(.welcome-lightning-canvas) {
-    position: relative;
-    z-index: 2;
-  }
-
-  .welcome-logo {
-    width: 104px !important;
-    height: 104px !important;
-    border-radius: 32px !important;
-    background:
-      radial-gradient(circle at 50% 35%, rgba(255,255,255,.18), transparent 19%),
-      radial-gradient(circle, rgba(255,7,58,.40), rgba(55,0,12,.88) 65%) !important;
-    border-color: rgba(255, 54, 84, .95) !important;
-    box-shadow:
-      0 0 50px rgba(255,7,58,.50),
-      0 0 96px rgba(255,7,58,.28),
-      inset 0 0 32px rgba(255,7,58,.20) !important;
-    color: #fff !important;
-    text-shadow: 0 0 18px rgba(255,7,58,.95);
-  }
-
-  .welcome h2 {
-    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Inter, system-ui, sans-serif !important;
-    text-transform: uppercase !important;
-    letter-spacing: .015em !important;
-    font-size: clamp(44px, 6.4vw, 86px) !important;
-    line-height: .86 !important;
-    margin-top: 6px !important;
-    background:
-      linear-gradient(90deg, #ffffff 0%, #ffe4e6 28%, #ff073a 55%, #ffb4b4 76%, #ffffff 100%) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    color: transparent !important;
-    filter:
-      drop-shadow(0 0 28px rgba(255,7,58,.46))
-      drop-shadow(0 10px 18px rgba(0,0,0,.72));
-  }
-
-  .welcome .small-note {
-    color: rgba(254,226,226,.88) !important;
-    font-weight: 650;
-  }
-
-  .welcome .metric {
-    background:
-      linear-gradient(145deg, rgba(20,0,9,.90), rgba(3,7,18,.78)) !important;
-    border-color: rgba(255,45,75,.32) !important;
-    box-shadow:
-      0 18px 60px rgba(0,0,0,.24),
-      inset 0 0 0 1px rgba(255,255,255,.025) !important;
-  }
-
-  .welcome input,
-  .welcome select {
-    background: rgba(0,0,0,.56) !important;
-    border-color: rgba(255,45,75,.34) !important;
-    box-shadow: inset 0 0 20px rgba(255,7,58,.06);
-  }
-
-  .welcome input:focus,
-  .welcome select:focus {
-    border-color: rgba(255,75,100,.85) !important;
-    box-shadow: 0 0 24px rgba(255,7,58,.20), inset 0 0 20px rgba(255,7,58,.08);
-  }
-
-  #startWelcome {
-    min-height: 52px;
-    padding-inline: 22px !important;
-    background:
-      linear-gradient(135deg, rgba(255,7,58,.62), rgba(80,0,20,.42)) !important;
-    border-color: rgba(255,75,100,.95) !important;
-    box-shadow:
-      0 0 36px rgba(255,7,58,.30),
-      inset 0 0 20px rgba(255,255,255,.05) !important;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-  }
+  .welcome-lightning-canvas{position:absolute;inset:-80px;width:calc(100% + 160px);height:calc(100% + 160px);pointer-events:none;z-index:0;mix-blend-mode:screen;opacity:1}
+  .welcome>*:not(.welcome-lightning-canvas){position:relative;z-index:2}
+  .welcome::before{content:"";position:absolute;inset:-22px;z-index:-2;border-radius:50px;background:radial-gradient(circle at 50% 0%, rgba(255, 7, 58, .50), transparent 35%),conic-gradient(from 180deg at 50% 50%,transparent 0deg,rgba(255, 7, 58, .35) 42deg,transparent 82deg,rgba(255, 60, 60, .22) 138deg,transparent 215deg,rgba(255, 7, 58, .30) 292deg,transparent 360deg);filter:blur(18px);animation:raidGateAura 4.8s ease-in-out infinite alternate;opacity:.98}
+  @keyframes raidGateAura{0%{transform:scale(1) rotate(-1deg);opacity:.78}100%{transform:scale(1.035) rotate(1deg);opacity:1}}
+  .welcome-logo{width:104px!important;height:104px!important;border-radius:32px!important;background:radial-gradient(circle at 50% 35%, rgba(255,255,255,.18), transparent 19%),radial-gradient(circle, rgba(255,7,58,.40), rgba(55,0,12,.88) 65%)!important;border-color:rgba(255,54,84,.95)!important;box-shadow:0 0 50px rgba(255,7,58,.50),0 0 96px rgba(255,7,58,.28),inset 0 0 32px rgba(255,7,58,.20)!important;color:#fff!important;text-shadow:0 0 18px rgba(255,7,58,.95)}
+  .welcome h2{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",Inter,system-ui,sans-serif!important;text-transform:uppercase!important;letter-spacing:.015em!important;font-size:clamp(44px,6.4vw,86px)!important;line-height:.86!important;margin-top:6px!important;background:linear-gradient(90deg,#fff 0%,#ffe4e6 28%,#ff073a 55%,#ffb4b4 76%,#fff 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;filter:drop-shadow(0 0 28px rgba(255,7,58,.46)) drop-shadow(0 10px 18px rgba(0,0,0,.72))}
 </style>
 
 </head>
@@ -1218,6 +1117,30 @@ h1{
   <button id="floatingClearBtn">Clear</button>
 </div>
 
+
+<div class="modal-backdrop" id="cloudAuthModal">
+  <div class="modal">
+    <h2>Cloud Sync Login</h2>
+    <div class="small-note">Sign in to sync your dashboard across laptop, phone, and browser.</div>
+    <div class="row">
+      <input id="cloudEmail" type="email" placeholder="Email address">
+      <input id="cloudPassword" type="password" placeholder="Password">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;">
+      <button id="closeCloudAuth">Cancel</button>
+      <button id="cloudSignup" class="primary">Create Account</button>
+      <button id="cloudLogin" class="primary">Log In</button>
+    </div>
+  </div>
+</div>
+
+<div class="cloud-status-panel" id="cloudStatusPanel">
+  <span id="cloudStatusText">Local mode</span>
+  <button id="openCloudAuth">Cloud Login</button>
+  <button id="cloudSyncNow" style="display:none;">Sync Now</button>
+  <button id="cloudLogout" class="danger" style="display:none;">Logout</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1495,135 +1418,34 @@ init();
 </script>
 
 
+
+
+
+<script src="cloud-sync.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+    });
+  }
+</script>
+
+
 <script id="raid-gate-welcome-lightning-js">
 (function(){
   function setupWelcomeLightning(){
-    const welcome = document.querySelector(".welcome");
+    const welcome=document.querySelector(".welcome");
     if(!welcome || welcome.querySelector(".welcome-lightning-canvas")) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.className = "welcome-lightning-canvas";
-    welcome.prepend(canvas);
-
-    const ctx = canvas.getContext("2d");
-    let w = 0, h = 0, dpr = 1;
-    let bolts = [];
-    let lastStrike = 0;
-
-    function resize(){
-      const rect = welcome.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = Math.max(1, rect.width + 160);
-      h = Math.max(1, rect.height + 160);
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-    }
-
-    function borderPoint(side){
-      if(side === 0) return {x: Math.random()*w, y: 20 + Math.random()*40};
-      if(side === 1) return {x: w - 20 - Math.random()*40, y: Math.random()*h};
-      if(side === 2) return {x: Math.random()*w, y: h - 20 - Math.random()*40};
-      return {x: 20 + Math.random()*40, y: Math.random()*h};
-    }
-
-    function makeBolt(forceHeavy=false){
-      const side = Math.floor(Math.random()*4);
-      const start = borderPoint(side);
-      const end = borderPoint((side + 1 + Math.floor(Math.random()*3)) % 4);
-      const points = [];
-      const segs = forceHeavy ? 16 : 10 + Math.floor(Math.random()*8);
-
-      for(let i=0;i<=segs;i++){
-        const t = i/segs;
-        points.push({
-          x: start.x + (end.x-start.x)*t + (Math.random()-.5)*(forceHeavy?55:38),
-          y: start.y + (end.y-start.y)*t + (Math.random()-.5)*(forceHeavy?55:38)
-        });
-      }
-
-      bolts.push({
-        points,
-        life: 1,
-        width: forceHeavy ? 2.8 + Math.random()*1.8 : 1.5 + Math.random()*1.6,
-        heavy: forceHeavy,
-        branches: 2 + Math.floor(Math.random()*5)
-      });
-
-      if(bolts.length > 12) bolts.shift();
-    }
-
-    function drawBolt(b){
-      ctx.save();
-      ctx.globalAlpha = Math.max(0,b.life);
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-
-      ctx.shadowColor = "rgba(255,7,58,.98)";
-      ctx.shadowBlur = b.heavy ? 34 : 24;
-      ctx.strokeStyle = b.heavy ? "rgba(255,7,58,.78)" : "rgba(255,7,58,.55)";
-      ctx.lineWidth = b.width + (b.heavy ? 6 : 4);
-      ctx.beginPath();
-      b.points.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
-      ctx.stroke();
-
-      ctx.shadowBlur = 8;
-      ctx.strokeStyle = "rgba(255,245,245,.86)";
-      ctx.lineWidth = Math.max(.9, b.width*.55);
-      ctx.beginPath();
-      b.points.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
-      ctx.stroke();
-
-      if(b.life > .42){
-        for(let k=0;k<b.branches;k++){
-          const idx = 1 + Math.floor(Math.random()*(b.points.length-2));
-          const p = b.points[idx];
-          const angle = Math.random()*Math.PI*2;
-          const len = 32 + Math.random()*(b.heavy?90:55);
-          ctx.shadowBlur = 20;
-          ctx.strokeStyle = "rgba(255, 32, 72, .52)";
-          ctx.lineWidth = b.heavy ? 1.2 : .85;
-          ctx.beginPath();
-          ctx.moveTo(p.x,p.y);
-          ctx.lineTo(p.x + Math.cos(angle)*len, p.y + Math.sin(angle)*len);
-          ctx.stroke();
-        }
-      }
-
-      ctx.restore();
-    }
-
-    function loop(t){
-      ctx.clearRect(0,0,w,h);
-
-      if(Math.random() > .88) makeBolt(false);
-
-      if(t - lastStrike > 1100 + Math.random()*1200){
-        makeBolt(true);
-        if(Math.random() > .45) setTimeout(()=>makeBolt(true), 90);
-        lastStrike = t;
-      }
-
-      bolts.forEach(b=>{
-        drawBolt(b);
-        b.life -= b.heavy ? .026 : .020;
-      });
-      bolts = bolts.filter(b=>b.life > 0);
-
-      requestAnimationFrame(loop);
-    }
-
-    resize();
-    window.addEventListener("resize", resize);
-    if(window.ResizeObserver) new ResizeObserver(resize).observe(welcome);
-    requestAnimationFrame(loop);
+    const canvas=document.createElement("canvas"); canvas.className="welcome-lightning-canvas"; welcome.prepend(canvas);
+    const ctx=canvas.getContext("2d"); let w=0,h=0,dpr=1,bolts=[],lastStrike=0;
+    function resize(){const r=welcome.getBoundingClientRect(); dpr=Math.min(devicePixelRatio||1,2); w=Math.max(1,r.width+160); h=Math.max(1,r.height+160); canvas.width=Math.floor(w*dpr); canvas.height=Math.floor(h*dpr); canvas.style.width=w+"px"; canvas.style.height=h+"px"; ctx.setTransform(dpr,0,0,dpr,0,0)}
+    function bp(s){if(s===0)return{x:Math.random()*w,y:20+Math.random()*40}; if(s===1)return{x:w-20-Math.random()*40,y:Math.random()*h}; if(s===2)return{x:Math.random()*w,y:h-20-Math.random()*40}; return{x:20+Math.random()*40,y:Math.random()*h}}
+    function makeBolt(heavy=false){const side=Math.floor(Math.random()*4),start=bp(side),end=bp((side+1+Math.floor(Math.random()*3))%4),pts=[],segs=heavy?16:10+Math.floor(Math.random()*8); for(let i=0;i<=segs;i++){const t=i/segs;pts.push({x:start.x+(end.x-start.x)*t+(Math.random()-.5)*(heavy?55:38),y:start.y+(end.y-start.y)*t+(Math.random()-.5)*(heavy?55:38)})} bolts.push({points:pts,life:1,width:heavy?2.8+Math.random()*1.8:1.5+Math.random()*1.6,heavy,branches:2+Math.floor(Math.random()*5)}); if(bolts.length>12)bolts.shift()}
+    function draw(b){ctx.save(); ctx.globalAlpha=Math.max(0,b.life); ctx.lineCap="round"; ctx.lineJoin="round"; ctx.shadowColor="rgba(255,7,58,.98)"; ctx.shadowBlur=b.heavy?34:24; ctx.strokeStyle=b.heavy?"rgba(255,7,58,.78)":"rgba(255,7,58,.55)"; ctx.lineWidth=b.width+(b.heavy?6:4); ctx.beginPath(); b.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.stroke(); ctx.shadowBlur=8; ctx.strokeStyle="rgba(255,245,245,.86)"; ctx.lineWidth=Math.max(.9,b.width*.55); ctx.beginPath(); b.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.stroke(); if(b.life>.42){for(let k=0;k<b.branches;k++){const idx=1+Math.floor(Math.random()*(b.points.length-2)),p=b.points[idx],a=Math.random()*Math.PI*2,len=32+Math.random()*(b.heavy?90:55); ctx.shadowBlur=20; ctx.strokeStyle="rgba(255,32,72,.52)"; ctx.lineWidth=b.heavy?1.2:.85; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x+Math.cos(a)*len,p.y+Math.sin(a)*len); ctx.stroke()}} ctx.restore()}
+    function loop(t){ctx.clearRect(0,0,w,h); if(Math.random()>.88)makeBolt(false); if(t-lastStrike>1100+Math.random()*1200){makeBolt(true); if(Math.random()>.45)setTimeout(()=>makeBolt(true),90); lastStrike=t} bolts.forEach(b=>{draw(b); b.life-=b.heavy?.026:.020}); bolts=bolts.filter(b=>b.life>0); requestAnimationFrame(loop)}
+    resize(); addEventListener("resize",resize); if(window.ResizeObserver)new ResizeObserver(resize).observe(welcome); requestAnimationFrame(loop);
   }
-
-  window.addEventListener("load", setupWelcomeLightning);
-  document.addEventListener("click", () => setTimeout(setupWelcomeLightning, 60), true);
-  setTimeout(setupWelcomeLightning, 500);
+  addEventListener("load",setupWelcomeLightning); document.addEventListener("click",()=>setTimeout(setupWelcomeLightning,60),true); setTimeout(setupWelcomeLightning,500);
 })();
 </script>
 

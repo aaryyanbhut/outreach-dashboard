@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AK Reliance Outreach Dashboard</title>
+<title>Outreach Dashboard</title>
 <style>
 :root{
   --bg:#040714;--bg2:#07111f;--panel:rgba(15,23,42,.88);--panel2:rgba(30,41,59,.68);
@@ -675,61 +675,181 @@ h1{
 </style>
 
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#070011">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Outreach Dashboard">
-<link rel="apple-touch-icon" href="icons/icon-192.svg">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<style id="cloud-sync-styles">
-  .cloud-status-panel {
-    position: fixed;
-    right: 18px;
-    top: 18px;
-    z-index: 90;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-    max-width: min(520px, calc(100vw - 36px));
-    padding: 10px 12px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(15,23,42,.94), rgba(10,10,24,.90));
-    border: 1px solid rgba(167,139,250,.38);
-    box-shadow: 0 18px 70px rgba(0,0,0,.35), 0 0 30px rgba(139,92,246,.16);
-    backdrop-filter: blur(14px);
+<style id="raid-gate-welcome-final">
+  .welcome-backdrop {
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding: 34px 18px !important;
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255, 0, 48, .20), transparent 36%),
+      rgba(0,0,0,.84) !important;
+    backdrop-filter: blur(22px) brightness(.48) saturate(1.25) !important;
+    -webkit-backdrop-filter: blur(22px) brightness(.48) saturate(1.25) !important;
   }
-  .cloud-status-panel span { color:#ddd6fe; font-size:12px; font-weight:900; padding:0 6px; }
-  .cloud-status-panel button { padding:8px 10px !important; font-size:12px; }
-  @media(max-width:720px){ .cloud-status-panel{left:12px; right:12px; top:auto; bottom:12px; border-radius:22px; justify-content:center;} }
-</style>
 
+  .welcome {
+    margin: auto 0 !important;
+    width: min(1040px, calc(100vw - 34px)) !important;
+    max-height: calc(100svh - 68px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    border-radius: 38px !important;
+    isolation: isolate !important;
+    position: relative !important;
+    background:
+      radial-gradient(circle at 50% -8%, rgba(255, 24, 55, .38), transparent 30%),
+      radial-gradient(circle at 12% 18%, rgba(255, 0, 72, .24), transparent 22%),
+      radial-gradient(circle at 88% 14%, rgba(255, 44, 44, .24), transparent 24%),
+      linear-gradient(145deg, rgba(3,0,7,.98), rgba(20,0,8,.96) 48%, rgba(3,4,12,.98)) !important;
+    border: 1px solid rgba(255, 37, 68, .80) !important;
+    box-shadow:
+      0 54px 180px rgba(0,0,0,.86),
+      0 0 120px rgba(255, 7, 58, .34),
+      0 0 24px rgba(255, 255, 255, .05) inset,
+      0 0 80px rgba(255, 7, 58, .20) inset !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 35, 65, .85) rgba(12, 0, 8, .72);
+  }
 
-<style id="red-welcome-upgrade">
-#redLightningCanvas{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:1;mix-blend-mode:screen;opacity:.78}
-#redCinematicAura{position:fixed;inset:-20%;pointer-events:none;z-index:0;background:radial-gradient(circle at 16% 10%,rgba(255,7,58,.20),transparent 26%),radial-gradient(circle at 86% 3%,rgba(255,0,64,.26),transparent 23%),radial-gradient(circle at 50% 110%,rgba(255,7,58,.13),transparent 32%);filter:blur(8px);animation:redAuraShift 9s ease-in-out infinite alternate}
-@keyframes redAuraShift{from{transform:translate3d(-1%,0,0) scale(1)}to{transform:translate3d(1.5%,1%,0) scale(1.03)}}
-.welcome-backdrop,.modal-backdrop,.celebration-backdrop{background:rgba(0,0,0,.72)!important;backdrop-filter:blur(18px) saturate(1.2)!important}
-.welcome{position:relative;overflow:hidden;border-radius:36px!important;background:radial-gradient(circle at 82% 0%,rgba(255,7,58,.34),transparent 34%),radial-gradient(circle at 8% 12%,rgba(255,7,58,.20),transparent 25%),linear-gradient(145deg,rgba(6,0,8,.98),rgba(20,0,8,.94) 44%,rgba(3,3,10,.98))!important;border:1px solid rgba(255,7,58,.62)!important;box-shadow:0 40px 140px rgba(0,0,0,.70),0 0 90px rgba(255,7,58,.25),inset 0 0 0 1px rgba(255,255,255,.04)!important}
-.welcome::before{content:"";position:absolute;inset:-20%;background:linear-gradient(120deg,transparent 0 33%,rgba(255,7,58,.22) 34%,transparent 36% 100%),linear-gradient(38deg,transparent 0 58%,rgba(255,7,58,.16) 59%,transparent 61% 100%);animation:redPanelStrike 4.6s ease-in-out infinite;opacity:.72;pointer-events:none}
-@keyframes redPanelStrike{0%,52%{transform:translateX(-70%) skewX(-16deg);opacity:0}65%{opacity:.85}88%,100%{transform:translateX(70%) skewX(-16deg);opacity:0}}
-.welcome>*{position:relative;z-index:2}.welcome-logo{border-color:rgba(255,7,58,.80)!important;color:#fff!important;background:radial-gradient(circle,rgba(255,7,58,.24),rgba(20,0,8,.80))!important;box-shadow:0 0 44px rgba(255,7,58,.35),inset 0 0 24px rgba(255,7,58,.12)!important;text-shadow:0 0 18px rgba(255,7,58,.90)}
-.welcome h2{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",Inter,sans-serif!important;text-transform:uppercase;letter-spacing:.01em!important;font-size:clamp(42px,6vw,72px)!important;line-height:.88!important;background:linear-gradient(90deg,#fff,#fecaca 35%,#ff073a 68%,#fff)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;filter:drop-shadow(0 0 24px rgba(255,7,58,.30))}
-.welcome .small-note{color:rgba(254,226,226,.82)!important}.welcome .metric{background:linear-gradient(145deg,rgba(24,0,12,.82),rgba(8,8,16,.72))!important;border-color:rgba(255,7,58,.24)!important}.welcome input,.welcome select{border-color:rgba(255,7,58,.28)!important;background:rgba(0,0,0,.44)!important}
-.welcome .primary,#startWelcome{background:linear-gradient(135deg,rgba(255,7,58,.48),rgba(139,0,28,.26))!important;border-color:rgba(255,7,58,.78)!important;box-shadow:0 0 34px rgba(255,7,58,.28)!important;text-transform:uppercase;letter-spacing:.06em}
-.app.glitch-hit,.panel.glitch-hit,.next-action.glitch-hit,.modal.glitch-hit,.welcome.glitch-hit,.celebration.glitch-hit{animation:akGlitchHit .38s steps(2,end) both}
-@keyframes akGlitchHit{0%{transform:translate(0,0);filter:none}18%{transform:translate(2px,-1px);filter:hue-rotate(-18deg) contrast(1.25)}32%{transform:translate(-3px,1px);clip-path:inset(5% 0 10% 0)}48%{transform:translate(3px,0);clip-path:inset(12% 0 4% 0)}64%{transform:translate(-1px,-2px);filter:drop-shadow(4px 0 rgba(255,7,58,.45))}100%{transform:translate(0,0);clip-path:inset(0);filter:none}}
-.glitch-flash{position:fixed;inset:0;z-index:999;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,7,58,.16),transparent),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 5px);mix-blend-mode:screen;animation:glitchFlash .24s ease-out forwards}
-@keyframes glitchFlash{from{opacity:.82;transform:skewX(-8deg) translateX(-2%)}to{opacity:0;transform:skewX(8deg) translateX(2%)}}
-.topbar h1{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",Inter,sans-serif!important;letter-spacing:.005em!important}
-@media (prefers-reduced-motion:reduce){#redLightningCanvas,#redCinematicAura{display:none!important}.welcome::before{animation:none!important}}
+  .welcome::-webkit-scrollbar { width: 10px; }
+  .welcome::-webkit-scrollbar-track { background: rgba(12,0,8,.72); border-radius: 999px; }
+  .welcome::-webkit-scrollbar-thumb { background: rgba(255,35,65,.85); border-radius: 999px; }
+
+  .welcome::before {
+    content: "";
+    position: absolute;
+    inset: -22px;
+    z-index: -2;
+    border-radius: 50px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 7, 58, .50), transparent 35%),
+      conic-gradient(from 180deg at 50% 50%,
+        transparent 0deg,
+        rgba(255, 7, 58, .35) 42deg,
+        transparent 82deg,
+        rgba(255, 60, 60, .22) 138deg,
+        transparent 215deg,
+        rgba(255, 7, 58, .30) 292deg,
+        transparent 360deg);
+    filter: blur(18px);
+    animation: raidGateAura 4.8s ease-in-out infinite alternate;
+    opacity: .98;
+  }
+
+  .welcome::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      linear-gradient(118deg, transparent 0 28%, rgba(255,255,255,.06) 29%, transparent 31%),
+      linear-gradient(56deg, transparent 0 62%, rgba(255,7,58,.15) 63%, transparent 65%),
+      repeating-linear-gradient(0deg, rgba(255,7,58,.045) 0 1px, transparent 1px 8px);
+    opacity: .86;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes raidGateAura {
+    0% { transform: scale(1) rotate(-1deg); opacity: .78; }
+    100% { transform: scale(1.035) rotate(1deg); opacity: 1; }
+  }
+
+  .welcome-lightning-canvas {
+    position: absolute;
+    inset: -80px;
+    width: calc(100% + 160px);
+    height: calc(100% + 160px);
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: screen;
+    opacity: 1;
+  }
+
+  .welcome > *:not(.welcome-lightning-canvas) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .welcome-logo {
+    width: 104px !important;
+    height: 104px !important;
+    border-radius: 32px !important;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(255,255,255,.18), transparent 19%),
+      radial-gradient(circle, rgba(255,7,58,.40), rgba(55,0,12,.88) 65%) !important;
+    border-color: rgba(255, 54, 84, .95) !important;
+    box-shadow:
+      0 0 50px rgba(255,7,58,.50),
+      0 0 96px rgba(255,7,58,.28),
+      inset 0 0 32px rgba(255,7,58,.20) !important;
+    color: #fff !important;
+    text-shadow: 0 0 18px rgba(255,7,58,.95);
+  }
+
+  .welcome h2 {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Inter, system-ui, sans-serif !important;
+    text-transform: uppercase !important;
+    letter-spacing: .015em !important;
+    font-size: clamp(44px, 6.4vw, 86px) !important;
+    line-height: .86 !important;
+    margin-top: 6px !important;
+    background:
+      linear-gradient(90deg, #ffffff 0%, #ffe4e6 28%, #ff073a 55%, #ffb4b4 76%, #ffffff 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    filter:
+      drop-shadow(0 0 28px rgba(255,7,58,.46))
+      drop-shadow(0 10px 18px rgba(0,0,0,.72));
+  }
+
+  .welcome .small-note {
+    color: rgba(254,226,226,.88) !important;
+    font-weight: 650;
+  }
+
+  .welcome .metric {
+    background:
+      linear-gradient(145deg, rgba(20,0,9,.90), rgba(3,7,18,.78)) !important;
+    border-color: rgba(255,45,75,.32) !important;
+    box-shadow:
+      0 18px 60px rgba(0,0,0,.24),
+      inset 0 0 0 1px rgba(255,255,255,.025) !important;
+  }
+
+  .welcome input,
+  .welcome select {
+    background: rgba(0,0,0,.56) !important;
+    border-color: rgba(255,45,75,.34) !important;
+    box-shadow: inset 0 0 20px rgba(255,7,58,.06);
+  }
+
+  .welcome input:focus,
+  .welcome select:focus {
+    border-color: rgba(255,75,100,.85) !important;
+    box-shadow: 0 0 24px rgba(255,7,58,.20), inset 0 0 20px rgba(255,7,58,.08);
+  }
+
+  #startWelcome {
+    min-height: 52px;
+    padding-inline: 22px !important;
+    background:
+      linear-gradient(135deg, rgba(255,7,58,.62), rgba(80,0,20,.42)) !important;
+    border-color: rgba(255,75,100,.95) !important;
+    box-shadow:
+      0 0 36px rgba(255,7,58,.30),
+      inset 0 0 20px rgba(255,255,255,.05) !important;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
 </style>
 
 </head>
 <body>
-<canvas id="redLightningCanvas"></canvas>
-<div id="redCinematicAura"></div>
 <div id="cursorCore"></div>
 <canvas id="lightningCanvas"></canvas>
 <div id="cursorAura"></div>
@@ -1073,7 +1193,7 @@ h1{
 <section id="tab-settings" style="display:none"><div class="metrics"><div class="metric"><div class="label">Name / Business Name</div><input id="profileNameInput" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Niche</div><input id="nicheInput" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Instagram Enabled</div><select id="instagramEnabled" style="width:100%;padding:12px;margin-top:10px"><option value="off">Off</option><option value="on">On</option></select></div><div class="metric"><div class="label">Instagram Goal</div><input id="igGoalInput" type="number" min="0" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Email Enabled</div><select id="emailEnabled" style="width:100%;padding:12px;margin-top:10px"><option value="off">Off</option><option value="on">On</option></select></div><div class="metric"><div class="label">Email Goal</div><input id="emailGoalInput" type="number" min="0" style="width:100%;padding:12px;margin-top:10px"></div><div class="metric"><div class="label">Sound Effects</div><select id="soundToggle" style="width:100%;padding:12px;margin-top:10px"><option value="on">On</option><option value="off">Off</option></select></div></div><div style="height:14px"></div><button id="saveSettings" class="primary">Save Settings</button></section>
 </div></main></div><footer class="footer"><div>Powered by <strong>AK Reliance</strong> · Created by <strong>Aaryyan Bhut</strong>, Founder</div><div>© <span id="copyrightYear"></span> AK Reliance. All rights reserved.</div></footer></div>
 
-<div class="welcome-backdrop" id="welcomeModal"><div class="welcome"><div class="welcome-logo" id="welcomeLogo">OS</div><h2>ENTER OUTREACH DASHBOARD</h2><div class="small-note">Set up your workspace once. Your goals, leads, scripts, and progress stay inside your browser unless you export a backup.</div><div style="margin-top:16px;display:grid;gap:12px"><label class="metric" style="min-height:auto"><div class="label">Your Name or Business Name</div><input id="onboardUserName" placeholder="Your Agency / Business Name" style="margin-top:10px"></label><label class="metric" style="min-height:auto"><div class="label">Your Niche</div><input id="onboardNiche" placeholder="Auto detailing, landscape lighting, real estate..." style="margin-top:10px"></label><div class="metric" style="min-height:auto"><div class="label">Instagram Outreach</div><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><select id="onboardInstagramEnabled" style="width:110px;padding:10px"><option value="off">Off</option><option value="on">On</option></select><input id="onboardInstagramGoal" type="number" min="0" value="40" style="width:100px;padding:10px"><span class="small-note">per day</span></div></div><div class="metric" style="min-height:auto"><div class="label">Email Outreach</div><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><select id="onboardEmailEnabled" style="width:110px;padding:10px"><option value="off">Off</option><option value="on">On</option></select><input id="onboardEmailGoal" type="number" min="0" value="20" style="width:100px;padding:10px"><span class="small-note">per day</span></div></div><div class="metric" style="min-height:auto"><div class="label">Sound Effects</div><select id="onboardSound" style="width:160px;padding:10px;margin-top:10px"><option value="on">On</option><option value="off">Off</option></select></div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button id="startWelcome" class="primary">Save & Start</button></div></div></div>
+<div class="welcome-backdrop" id="welcomeModal"><div class="welcome"><div class="welcome-logo" id="welcomeLogo">OS</div><h2>Welcome to Outreach Dashboard</h2><div class="small-note">Set up your workspace once. Your goals, leads, scripts, and progress stay inside your browser unless you export a backup.</div><div style="margin-top:16px;display:grid;gap:12px"><label class="metric" style="min-height:auto"><div class="label">Your Name or Business Name</div><input id="onboardUserName" placeholder="Your Agency / Business Name" style="margin-top:10px"></label><label class="metric" style="min-height:auto"><div class="label">Your Niche</div><input id="onboardNiche" placeholder="Auto detailing, landscape lighting, real estate..." style="margin-top:10px"></label><div class="metric" style="min-height:auto"><div class="label">Instagram Outreach</div><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><select id="onboardInstagramEnabled" style="width:110px;padding:10px"><option value="off">Off</option><option value="on">On</option></select><input id="onboardInstagramGoal" type="number" min="0" value="40" style="width:100px;padding:10px"><span class="small-note">per day</span></div></div><div class="metric" style="min-height:auto"><div class="label">Email Outreach</div><div style="display:flex;gap:10px;align-items:center;margin-top:10px"><select id="onboardEmailEnabled" style="width:110px;padding:10px"><option value="off">Off</option><option value="on">On</option></select><input id="onboardEmailGoal" type="number" min="0" value="20" style="width:100px;padding:10px"><span class="small-note">per day</span></div></div><div class="metric" style="min-height:auto"><div class="label">Sound Effects</div><select id="onboardSound" style="width:160px;padding:10px;margin-top:10px"><option value="on">On</option><option value="off">Off</option></select></div></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button id="startWelcome" class="primary">Save & Start</button></div></div></div>
 <div class="celebration-backdrop" id="celebrationModal"><div class="celebration"><h2>Done for today.</h2><div class="small-note">Daily new outreach target completed. Export a backup or unlock another batch when ready.</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button id="closeCelebration">Close</button><button id="celebrateMore" class="success">Show More Leads</button></div></div></div>
 <div class="modal-backdrop" id="pasteModal"><div class="modal"><h2>Paste CSV</h2><div class="small-note">Use headers like Name, Website, Email, Instagram, Phone, Notes, Channel</div><textarea id="csvText" style="width:100%;min-height:210px;padding:14px" placeholder="Name,Website,Email,Instagram,Phone,Channel"></textarea><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button id="closePaste">Cancel</button><button id="importPaste" class="primary">Import</button></div></div></div>
 <div class="modal-backdrop" id="leadModal"><div class="modal"><h2 id="leadModalTitle">Add Lead</h2><input type="hidden" id="leadId"><div class="row"><input id="leadName" placeholder="Business name"><input id="leadWebsite" placeholder="Website"><input id="leadEmail" placeholder="Email"><input id="leadInstagram" placeholder="Instagram"><input id="leadPhone" placeholder="Phone"><select id="leadChannel"><option>Instagram</option><option>Email</option></select></div><textarea id="leadNotes" placeholder="Notes" style="width:100%;min-height:100px;padding:12px;margin-top:10px"></textarea><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button id="closeLead">Cancel</button><button id="saveLead" class="primary">Save Lead</button></div></div></div>
@@ -1096,29 +1216,6 @@ h1{
   <span id="floatingSelectionText">0 selected</span>
   <button class="danger" id="floatingDeleteBtn">Delete</button>
   <button id="floatingClearBtn">Clear</button>
-</div>
-
-
-<div class="modal-backdrop" id="cloudAuthModal">
-  <div class="modal">
-    <h2>Cloud Sync Login</h2>
-    <div class="small-note">Sign in to sync your dashboard across laptop, phone, and browser.</div>
-    <div class="row">
-      <input id="cloudEmail" type="email" placeholder="Email address">
-      <input id="cloudPassword" type="password" placeholder="Password">
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;">
-      <button id="closeCloudAuth">Cancel</button>
-      <button id="cloudSignup" class="primary">Create Account</button>
-      <button id="cloudLogin" class="primary">Log In</button>
-    </div>
-  </div>
-</div>
-<div class="cloud-status-panel" id="cloudStatusPanel">
-  <span id="cloudStatusText">Local mode</span>
-  <button id="openCloudAuth">Cloud Login</button>
-  <button id="cloudSyncNow" style="display:none;">Sync Now</button>
-  <button id="cloudLogout" class="danger" style="display:none;">Logout</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1398,26 +1495,135 @@ init();
 </script>
 
 
-<script src="cloud-sync.js"></script>
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
-    });
-  }
-</script>
-
-
-<script id="red-welcome-upgrade-js">
+<script id="raid-gate-welcome-lightning-js">
 (function(){
- const canvas=document.getElementById("redLightningCanvas"); if(!canvas)return; const ctx=canvas.getContext("2d"); let w,h,dpr,bolts=[],last=0;
- function resize(){dpr=Math.min(devicePixelRatio||1,2); w=innerWidth; h=innerHeight; canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+"px"; canvas.style.height=h+"px"; ctx.setTransform(dpr,0,0,dpr,0,0)}
- function makeBolt(){const sx=Math.random()>.45?w+30:-30,sy=Math.random()*h*.35,ex=Math.random()*w,ey=h*.15+Math.random()*h*.55,pts=[],segs=10+Math.floor(Math.random()*8); for(let i=0;i<=segs;i++){const t=i/segs;pts.push({x:sx+(ex-sx)*t+(Math.random()-.5)*42,y:sy+(ey-sy)*t+(Math.random()-.5)*42})} bolts.push({pts,life:1,width:1.5+Math.random()*2.4,branches:Math.random()>.2}); if(bolts.length>6)bolts.shift()}
- function draw(b){ctx.save();ctx.globalAlpha=Math.max(0,b.life);ctx.lineCap="round";ctx.lineJoin="round";ctx.shadowColor="rgba(255,7,58,.95)";ctx.shadowBlur=28;ctx.strokeStyle="rgba(255,7,58,.72)";ctx.lineWidth=b.width+3.5;ctx.beginPath();b.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.shadowBlur=6;ctx.strokeStyle="rgba(255,220,220,.75)";ctx.lineWidth=Math.max(.8,b.width*.55);ctx.beginPath();b.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke(); if(b.branches&&b.life>.35){for(let i=2;i<b.pts.length-2;i+=3){const p=b.pts[i];ctx.shadowBlur=18;ctx.strokeStyle="rgba(255,7,58,.45)";ctx.lineWidth=.9;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+(Math.random()-.5)*120,p.y+(Math.random()-.5)*90);ctx.stroke()}}ctx.restore()}
- function loop(t){ctx.clearRect(0,0,w,h); if(t-last>1400+Math.random()*1200){makeBolt();last=t} bolts.forEach(b=>{draw(b);b.life-=.018}); bolts=bolts.filter(b=>b.life>0); requestAnimationFrame(loop)}
- function glitch(target){const el=target||document.querySelector(".app"); if(el){el.classList.remove("glitch-hit");void el.offsetWidth;el.classList.add("glitch-hit");setTimeout(()=>el.classList.remove("glitch-hit"),420)} const f=document.createElement("div");f.className="glitch-flash";document.body.appendChild(f);setTimeout(()=>f.remove(),260)}
- window.akGlitch=glitch; document.addEventListener("click",e=>{const t=e.target,txt=(t&&t.textContent||"").toLowerCase(); if(txt.includes("done")||txt.includes("close")||txt.includes("cancel")||txt.includes("save & start")||txt.includes("delete")) setTimeout(()=>glitch(t.closest(".modal,.welcome,.celebration,.panel,.next-action")||document.querySelector(".app")),40)},true);
- resize(); addEventListener("resize",resize); requestAnimationFrame(loop);
+  function setupWelcomeLightning(){
+    const welcome = document.querySelector(".welcome");
+    if(!welcome || welcome.querySelector(".welcome-lightning-canvas")) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.className = "welcome-lightning-canvas";
+    welcome.prepend(canvas);
+
+    const ctx = canvas.getContext("2d");
+    let w = 0, h = 0, dpr = 1;
+    let bolts = [];
+    let lastStrike = 0;
+
+    function resize(){
+      const rect = welcome.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.max(1, rect.width + 160);
+      h = Math.max(1, rect.height + 160);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+
+    function borderPoint(side){
+      if(side === 0) return {x: Math.random()*w, y: 20 + Math.random()*40};
+      if(side === 1) return {x: w - 20 - Math.random()*40, y: Math.random()*h};
+      if(side === 2) return {x: Math.random()*w, y: h - 20 - Math.random()*40};
+      return {x: 20 + Math.random()*40, y: Math.random()*h};
+    }
+
+    function makeBolt(forceHeavy=false){
+      const side = Math.floor(Math.random()*4);
+      const start = borderPoint(side);
+      const end = borderPoint((side + 1 + Math.floor(Math.random()*3)) % 4);
+      const points = [];
+      const segs = forceHeavy ? 16 : 10 + Math.floor(Math.random()*8);
+
+      for(let i=0;i<=segs;i++){
+        const t = i/segs;
+        points.push({
+          x: start.x + (end.x-start.x)*t + (Math.random()-.5)*(forceHeavy?55:38),
+          y: start.y + (end.y-start.y)*t + (Math.random()-.5)*(forceHeavy?55:38)
+        });
+      }
+
+      bolts.push({
+        points,
+        life: 1,
+        width: forceHeavy ? 2.8 + Math.random()*1.8 : 1.5 + Math.random()*1.6,
+        heavy: forceHeavy,
+        branches: 2 + Math.floor(Math.random()*5)
+      });
+
+      if(bolts.length > 12) bolts.shift();
+    }
+
+    function drawBolt(b){
+      ctx.save();
+      ctx.globalAlpha = Math.max(0,b.life);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      ctx.shadowColor = "rgba(255,7,58,.98)";
+      ctx.shadowBlur = b.heavy ? 34 : 24;
+      ctx.strokeStyle = b.heavy ? "rgba(255,7,58,.78)" : "rgba(255,7,58,.55)";
+      ctx.lineWidth = b.width + (b.heavy ? 6 : 4);
+      ctx.beginPath();
+      b.points.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+      ctx.stroke();
+
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = "rgba(255,245,245,.86)";
+      ctx.lineWidth = Math.max(.9, b.width*.55);
+      ctx.beginPath();
+      b.points.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+      ctx.stroke();
+
+      if(b.life > .42){
+        for(let k=0;k<b.branches;k++){
+          const idx = 1 + Math.floor(Math.random()*(b.points.length-2));
+          const p = b.points[idx];
+          const angle = Math.random()*Math.PI*2;
+          const len = 32 + Math.random()*(b.heavy?90:55);
+          ctx.shadowBlur = 20;
+          ctx.strokeStyle = "rgba(255, 32, 72, .52)";
+          ctx.lineWidth = b.heavy ? 1.2 : .85;
+          ctx.beginPath();
+          ctx.moveTo(p.x,p.y);
+          ctx.lineTo(p.x + Math.cos(angle)*len, p.y + Math.sin(angle)*len);
+          ctx.stroke();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function loop(t){
+      ctx.clearRect(0,0,w,h);
+
+      if(Math.random() > .88) makeBolt(false);
+
+      if(t - lastStrike > 1100 + Math.random()*1200){
+        makeBolt(true);
+        if(Math.random() > .45) setTimeout(()=>makeBolt(true), 90);
+        lastStrike = t;
+      }
+
+      bolts.forEach(b=>{
+        drawBolt(b);
+        b.life -= b.heavy ? .026 : .020;
+      });
+      bolts = bolts.filter(b=>b.life > 0);
+
+      requestAnimationFrame(loop);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    if(window.ResizeObserver) new ResizeObserver(resize).observe(welcome);
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener("load", setupWelcomeLightning);
+  document.addEventListener("click", () => setTimeout(setupWelcomeLightning, 60), true);
+  setTimeout(setupWelcomeLightning, 500);
 })();
 </script>
 

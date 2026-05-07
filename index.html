@@ -1454,6 +1454,72 @@ main.panel .panel-body > section::-webkit-scrollbar-thumb { background:rgba(139,
   }
 </style>
 
+
+
+<style id="ak-final-stability-patch-css">
+  /* Keep cloud auth above Profile and every other modal */
+  #cloudAuthModal{
+    z-index:100000 !important;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:22px !important;
+  }
+  #cloudAuthModal .modal{
+    position:relative !important;
+    z-index:100001 !important;
+    max-height:calc(100svh - 44px) !important;
+  }
+
+  /* Outreach popup remaining counter */
+  .op-remaining-counter{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    padding:9px 12px;
+    border-radius:999px;
+    background:rgba(15,23,42,.74);
+    border:1px solid rgba(167,139,250,.34);
+    color:#ddd6fe;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    box-shadow:0 0 22px rgba(139,92,246,.12);
+  }
+  .op-remaining-counter strong{color:#fff;font-size:14px;}
+
+  /* Dedicated outreach undo — bigger, visible, but not annoying */
+  #outreachUndoToast{
+    position:fixed;
+    left:24px;
+    bottom:28px;
+    z-index:120000;
+    width:min(390px,calc(100vw - 48px));
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:15px 16px;
+    border-radius:22px;
+    background:linear-gradient(135deg,rgba(8,0,20,.97),rgba(18,5,40,.95));
+    border:1px solid rgba(167,139,250,.60);
+    box-shadow:0 28px 90px rgba(0,0,0,.62),0 0 42px rgba(139,92,246,.22);
+    backdrop-filter:blur(12px);
+  }
+  #outreachUndoToast.show{display:flex;animation:outreachUndoIn .18s ease both;}
+  #outreachUndoToast .undo-copy{line-height:1.35;}
+  #outreachUndoToast .undo-title{font-size:13px;font-weight:950;color:#f8fafc;}
+  #outreachUndoToast .undo-sub{font-size:12px;color:rgba(221,214,254,.72);margin-top:2px;}
+  #outreachUndoToast button{white-space:nowrap;border-radius:999px;padding:9px 13px;font-weight:950;}
+  @keyframes outreachUndoIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @media(max-width:720px){#outreachUndoToast{left:12px;right:12px;bottom:14px;width:auto;}}
+
+  /* Absolute smooth mode: cursor electricity stays removed. */
+  #cursorAura,#cursorCore,#lightningCanvas,#cursorEffectsCanvas,.cursor-fiber,.cursor-bolt,.cursor-spark{
+    display:none !important;
+  }
+</style>
 </head>
 <body>
 <div id="coteQuoteScreen" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .6s ease;">
@@ -2165,6 +2231,176 @@ init();
     document.getElementById("cursorCore")?.remove();
     document.getElementById("cursorEffectsCanvas")?.remove();
   }catch(e){}
+})();
+</script>
+
+
+
+<script id="ak-final-stability-patch-js">
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const toastSafe = msg => { try { if (typeof toast === "function") toast(msg); else console.log(msg); } catch(e){ console.log(msg); } };
+  const clone = obj => JSON.parse(JSON.stringify(obj || {}));
+  const esc = s => String(s ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+
+  let currentId = null;
+  let undoPayload = null;
+  let undoTimer = null;
+
+  function getState(){ try { return state; } catch(e){ return window.state; } }
+  function leads(){ const st=getState(); return Array.isArray(st?.leads) ? st.leads : []; }
+  function lead(id){ return leads().find(l => String(l.id) === String(id)); }
+  function mode(){ try { return typeof currentMode === "function" ? currentMode() : (getState()?.settings?.mode || "Instagram"); } catch(e){ return "Instagram"; } }
+  function today(){ try { return typeof todayKey === "function" ? todayKey() : new Date().toISOString().slice(0,10); } catch(e){ return new Date().toISOString().slice(0,10); } }
+  function hasInfo(l,ch){ return ch === "Instagram" ? !!l.instagram : ch === "Email" ? !!l.email : true; }
+  function sentAlready(l,ch){ return ch === "Instagram" ? !!l.instagramSent : ch === "Email" ? !!l.emailSent : false; }
+  function activeStop(l){ return ["Not Interested","Client","Call Booked","Interested"].includes(l?.replyStatus); }
+  function usableChannel(l){ const preferred=mode(); if(hasInfo(l,preferred) && !sentAlready(l,preferred)) return preferred; if(l.instagram && !l.instagramSent) return "Instagram"; if(l.email && !l.emailSent) return "Email"; return preferred; }
+  function setMode(ch){ try { const st=getState(); if(ch && st?.settings && st.settings.mode !== ch){ st.settings.mode = ch; if(typeof saveState === "function") saveState(); } } catch(e){} }
+  function rawEligibleFor(ch){ return leads().filter(l => !activeStop(l) && hasInfo(l,ch) && !sentAlready(l,ch)); }
+  function remainingToday(){
+    try {
+      if (typeof goal === "function" && typeof todayNewCompleted === "function") return Math.max(0, Number(goal() || 0) - Number(todayNewCompleted() || 0));
+    } catch(e){}
+    const ch=mode(), t=today();
+    const target = Number(getState()?.settings?.[ch === "Instagram" ? "igGoal" : "emailGoal"] || 0);
+    const done = leads().filter(l => l.lastActionDate === t && (ch === "Instagram" ? l.instagramSent : l.emailSent)).length;
+    return Math.max(0, target - done);
+  }
+  function updateCounter(){
+    const anchor = $("opMode");
+    if(!anchor) return;
+    let c = $("opRemainingCounter");
+    if(!c){
+      c = document.createElement("div");
+      c.id = "opRemainingCounter";
+      c.className = "op-remaining-counter";
+      anchor.insertAdjacentElement("afterend", c);
+    }
+    c.innerHTML = `<strong>${remainingToday()}</strong> outreaches remaining today`;
+  }
+  function fill(l){
+    if(!l) return;
+    currentId = l.id;
+    const ch=mode();
+    const other = ch === "Instagram" ? "Email" : "Instagram";
+    if($("opName")) $("opName").textContent = l.name || "Unnamed Lead";
+    if($("opMode")) $("opMode").textContent = ch + " outreach mission";
+    if($("opSub")) $("opSub").textContent = `Stage: ${l.status || "New"} · Reply: ${l.replyStatus || "No Reply"}`;
+    if($("opWebsite")) $("opWebsite").innerHTML = l.website ? `<a class="link-pill" target="_blank" href="${esc(l.website)}">Website</a>` : "—";
+    if($("opInstagram")) $("opInstagram").innerHTML = l.instagram ? `<a class="link-pill" target="_blank" href="${esc(l.instagram)}">Instagram</a>` : "—";
+    if($("opEmail")) $("opEmail").textContent = l.email || "—";
+    if($("opPhone")) $("opPhone").textContent = l.phone || "—";
+    if($("opNotes")) $("opNotes").innerHTML = "<strong>Notes:</strong> " + esc(l.notes || "No notes yet.");
+    if($("opTags")) $("opTags").innerHTML = [`Mode: ${ch}`, l.instagramSent ? "Instagram sent" : "Instagram not sent", l.emailSent ? "Email sent" : "Email not sent", l.nextFollowupDate ? `Next follow-up: ${l.nextFollowupDate}` : "No follow-up date"].map(t => `<span class="op-tag">${esc(t)}</span>`).join("");
+    if($("opWarn")){
+      const contactedOther = other === "Instagram" ? !!l.instagramSent : !!l.emailSent;
+      $("opWarn").style.display = contactedOther ? "block" : "none";
+      $("opWarn").textContent = contactedOther ? `Already contacted on ${other}. Continue only if intentional.` : "";
+    }
+    if($("opSent")) $("opSent").textContent = ch + " Outreach Sent";
+    updateCounter();
+  }
+  function bestFirst(){
+    try {
+      const a = [ ...(typeof eligibleFollowups === "function" ? eligibleFollowups() : []), ...(typeof eligibleNew === "function" ? eligibleNew() : []) ];
+      const good = a.find(l => hasInfo(l, mode()) && !sentAlready(l, mode())) || a.find(l => (l.instagram && !l.instagramSent) || (l.email && !l.emailSent));
+      if(good){ setMode(usableChannel(good)); return good; }
+    } catch(e){}
+    const direct = rawEligibleFor(mode())[0];
+    if(direct) return direct;
+    const fallback = leads().find(l => !activeStop(l) && ((l.instagram && !l.instagramSent) || (l.email && !l.emailSent)));
+    if(fallback){ setMode(usableChannel(fallback)); return fallback; }
+    return null;
+  }
+  function nextLead(){ return rawEligibleFor(mode()).find(l => String(l.id) !== String(currentId)) || bestFirst(); }
+  function saveRender(){ try{ if(typeof saveState === "function") saveState(); }catch(e){} try{ if(typeof render === "function") render(); }catch(e){} try{ if(typeof renderChannelConv === "function") renderChannelConv(); }catch(e){} updateCounter(); }
+  function markSentCore(l){
+    const ch=mode(), t=today();
+    if(ch === "Instagram") l.instagramSent = true;
+    if(ch === "Email") l.emailSent = true;
+    l.done = true;
+    l.channel = ch;
+    l.lastActionDate = t;
+    l.status = Number(l.followupStage || 0) === 0 ? `${ch} Contacted` : `${ch} Follow-up Sent`;
+    try {
+      if (typeof followupDelays !== "undefined" && Array.isArray(followupDelays)) {
+        if(Number(l.followupStage || 0) >= followupDelays.length){
+          l.status = `Final ${ch} Follow-up Sent`; l.todayAction = ""; l.nextFollowupDate = "";
+        } else {
+          const n = new Date(); n.setDate(n.getDate() + followupDelays[Number(l.followupStage || 0)]);
+          l.followupStage = Number(l.followupStage || 0) + 1;
+          l.nextFollowupDate = todayKey(n);
+          l.todayAction = "Not Yet";
+        }
+      }
+    } catch(e){}
+  }
+  function showUndo(payload){
+    undoPayload = payload;
+    let box = $("outreachUndoToast");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "outreachUndoToast";
+      box.innerHTML = `<div class="undo-copy"><div class="undo-title">Outreach marked as sent.</div><div class="undo-sub">Accidental click? Restore this lead.</div></div><button type="button" id="outreachUndoBtn">Undo</button>`;
+      document.body.appendChild(box);
+      box.querySelector("#outreachUndoBtn").addEventListener("click", undoLast);
+    }
+    box.classList.add("show");
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(()=>box.classList.remove("show"), 8000);
+  }
+  function undoLast(){
+    if(!undoPayload) return;
+    const l = lead(undoPayload.id);
+    if(l) Object.assign(l, clone(undoPayload.before));
+    currentId = undoPayload.id;
+    saveRender();
+    if(l){ fill(l); $("outreachPopupFixed")?.classList.add("show"); }
+    $("outreachUndoToast")?.classList.remove("show");
+    undoPayload = null;
+    toastSafe("Outreach undone.");
+  }
+  function openPopup(id){
+    let l = id ? lead(id) : bestFirst();
+    if(!l) return toastSafe("No eligible lead found. Import leads with an Instagram profile or email address.");
+    setMode(usableChannel(l));
+    currentId = l.id;
+    fill(l);
+    const modal = $("outreachPopupFixed");
+    if(modal) modal.classList.add("show");
+  }
+  function closePopup(){ $("outreachPopupFixed")?.classList.remove("show"); }
+  function sentClick(e){
+    if(!e.target.closest || !e.target.closest("#opSent")) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    const l = lead(currentId);
+    if(!l) return;
+    const before = clone(l);
+    markSentCore(l);
+    saveRender();
+    showUndo({ id:l.id, before });
+    const n = nextLead();
+    if(n && String(n.id) !== String(l.id)){ currentId = n.id; fill(n); }
+    else { closePopup(); toastSafe("No more leads in this mode right now."); }
+  }
+
+  // Override the old popup opener without touching the rest of the app.
+  window.openOutreachPopup = openPopup;
+  window.closeOutreachPopup = closePopup;
+  document.addEventListener("click", sentClick, true);
+  window.addEventListener("load", ()=>{
+    try { $("opSent") && ($("opSent").textContent = mode() + " Outreach Sent"); } catch(e){}
+    updateCounter();
+    // Make profile cloud buttons direct and reliable even if the hidden cloud strip is visually hidden.
+    $("profileCloudLogin")?.addEventListener("click", function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      const m = $("cloudAuthModal");
+      if(m){ m.style.display = "flex"; m.style.zIndex = "100000"; }
+      try { if (window.AKCloudSync?.refresh) window.AKCloudSync.refresh(); } catch(e){}
+    }, true);
+  });
 })();
 </script>
 
@@ -4423,6 +4659,199 @@ setTimeout(()=>{
   window.renderTables = renderTables;
 
   setTimeout(() => { if(typeof render === 'function') render(); }, 100);
+})();
+</script>
+
+
+
+<!-- AK RELIANCE FINAL BUGFIX PATCH: completed section + global search + counters -->
+<style id="ak-final-bugfix-css">
+  #completedTable .status-card-list,
+  #leadsTable .status-card-list,
+  #hotTable .status-card-list { min-height: 420px; }
+  .gs-result { justify-content: space-between; }
+  .gs-result > div:first-child { min-width: 0; }
+</style>
+<script id="ak-final-bugfix-js">
+(function(){
+  function appState(){ try { return state; } catch(e){ return window.state || null; } }
+  function appLeads(){ const st = appState(); return Array.isArray(st?.leads) ? st.leads : []; }
+  function appScripts(){ const st = appState(); return Array.isArray(st?.scripts) ? st.scripts : []; }
+  function byId(id){ return document.getElementById(id); }
+  function safeEsc(v){
+    try { if(typeof esc === 'function') return esc(v); } catch(e){}
+    return String(v == null ? '' : v).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+  function callRender(){ try { if(typeof render === 'function') render(); } catch(e){} }
+  function callSave(){ try { if(typeof saveState === 'function') saveState(); } catch(e){} }
+  function today(){ try { return typeof todayKey === 'function' ? todayKey() : new Date().toISOString().slice(0,10); } catch(e){ return new Date().toISOString().slice(0,10); } }
+
+  // 1) Completed section fix: show every lead that was actually sent/completed.
+  // Some prior code required BOTH done=true and lastActionDate, so one sent lead could disappear.
+  function isCompletedLead(l){
+    if(!l) return false;
+    if(String(l.status || '').toLowerCase() === 'skipped') return false;
+    if(l.done) return true;
+    if(l.instagramSent || l.emailSent) return true;
+    if(l.lastActionDate && /(contacted|sent|follow-up)/i.test(String(l.status || ''))) return true;
+    return false;
+  }
+
+  function cardFallback(l, i, type){
+    const current = l.replyStatus || 'No Reply';
+    const sentLine = l.instagramSent ? 'Instagram sent' : (l.emailSent ? 'Email sent' : (l.channel ? safeEsc(l.channel) : 'Completed'));
+    const last = l.lastActionDate || 'Date not saved';
+    return `<div class="lead-card ${expandedId === l.id ? 'expanded' : ''}" data-id="${safeEsc(l.id)}" onclick="toggleExpand(event,${Number(l.id)})">
+      <div class="rank">${i+1}</div>
+      <div>
+        <div class="lead-name">${safeEsc(l.name || 'Unnamed Lead')}</div>
+        <div class="lead-meta">
+          ${l.website ? `<a class="link-pill" onclick="event.stopPropagation()" href="${safeEsc(l.website)}" target="_blank">Website</a>` : ''}
+          ${l.instagram ? `<a class="link-pill" onclick="event.stopPropagation()" href="${safeEsc(l.instagram)}" target="_blank">Instagram</a>` : ''}
+          ${l.email ? `<span class="pill">${safeEsc(l.email)}</span>` : ''}
+          <span class="pill">${safeEsc(sentLine)}</span>
+          <span class="pill">${safeEsc(last)}</span>
+        </div>
+      </div>
+      <div class="card-actions"><span class="reply-status-badge">${safeEsc(current)}</span></div>
+      <div class="expanded-panel">
+        <div class="status-panel-visible">
+          <div class="status-panel-head"><div class="status-panel-title">Update reply status</div><div class="status-current-badge">Current: ${safeEsc(current)}</div></div>
+          <div class="status-button-grid">
+            ${['No Reply','Replied','Interested','Call Booked','Client','Not Interested'].map(s=>`<button class="reply-btn ${current===s?'active-status':''}" onclick="event.stopPropagation();setStatusVisible(${Number(l.id)},'${s}')">${s}</button>`).join('')}
+          </div>
+        </div>
+        <div class="card-mini-actions"><button onclick="event.stopPropagation();openNotes(${Number(l.id)})">Notes</button><button onclick="event.stopPropagation();openEditLead(${Number(l.id)})">Edit</button></div>
+      </div>
+    </div>`;
+  }
+
+  function renderOneCard(l, i, type){
+    try {
+      if(typeof renderCard === 'function') return renderCard(l, i, type);
+      if(typeof window.renderCard === 'function') return window.renderCard(l, i, type);
+    } catch(e){}
+    return cardFallback(l, i, type);
+  }
+
+  function cardWrap(cards, emptyText){
+    return `<tbody><tr><td colspan="10"><div class="status-card-list">${cards || `<div class="empty">${safeEsc(emptyText)}</div>`}</div></td></tr></tbody>`;
+  }
+
+  function patchedRenderTables(){
+    const leads = appLeads();
+    const q = (byId('searchAll')?.value || '').toLowerCase().trim();
+    const filtered = q ? leads.filter(l => JSON.stringify(l).toLowerCase().includes(q)) : leads;
+
+    const leadsEl = byId('leadsTable');
+    if(leadsEl) leadsEl.innerHTML = cardWrap(filtered.map((l,i)=>renderOneCard(l,i,'all')).join(''), 'No leads found.');
+
+    const hot = leads.filter(l => ['Interested','Call Booked','Client'].includes(l.replyStatus));
+    const hotEl = byId('hotTable');
+    if(hotEl) hotEl.innerHTML = cardWrap(hot.map((l,i)=>renderOneCard(l,i,'hot')).join(''), 'No hot leads yet.');
+
+    const completed = leads.filter(isCompletedLead).sort((a,b) => String(b.lastActionDate || '').localeCompare(String(a.lastActionDate || '')) || Number(b.id || 0) - Number(a.id || 0));
+    const compEl = byId('completedTable');
+    if(compEl) compEl.innerHTML = cardWrap(completed.map((l,i)=>renderOneCard(l,i,'completed')).join(''), 'No completed outreach yet.');
+
+    try {
+      const skippedEl = byId('skippedTable');
+      const st = appState();
+      if(skippedEl && typeof tableHtml === 'function') skippedEl.innerHTML = tableHtml(['Date','Reason','Name','Email','Raw'], (st?.skipped || []).map(x=>[safeEsc((x.date||'').slice(0,10)),safeEsc(x.reason),safeEsc(x.name),safeEsc(x.email),safeEsc(x.raw)]));
+    } catch(e){}
+    try { if(typeof renderScripts === 'function') renderScripts(); } catch(e){}
+    try { if(typeof renderIncome === 'function') renderIncome(); } catch(e){}
+    try { if(typeof renderSparkline === 'function') renderSparkline(); } catch(e){}
+    try { if(typeof renderChannelConv === 'function') renderChannelConv(); } catch(e){}
+  }
+
+  try { renderTables = patchedRenderTables; } catch(e){}
+  window.renderTables = patchedRenderTables;
+
+  // 2) Global search fix: use real `state`, not `window.state`.
+  function runSearch(){
+    const input = byId('globalSearchInput');
+    const results = byId('globalSearchResults');
+    if(!input || !results) return;
+    const q = input.value.toLowerCase().trim();
+    if(!q){ results.innerHTML = ''; return; }
+    const leads = appLeads();
+    const scripts = appScripts();
+    const leadMatches = leads.filter(l => {
+      const hay = [l.name,l.businessName,l.website,l.instagram,l.email,l.phone,l.status,l.replyStatus,l.notes,l.channel].join(' ').toLowerCase();
+      return hay.includes(q) || JSON.stringify(l).toLowerCase().includes(q);
+    }).slice(0,10).map(l => ({type:'lead', id:l.id, name:l.name || 'Unnamed Lead', meta:`${l.status || 'New'} · ${l.replyStatus || 'No Reply'}`, tag:'Lead'}));
+    const scriptMatches = scripts.filter(s => JSON.stringify(s).toLowerCase().includes(q)).slice(0,4).map(s => ({type:'script', id:s.id || 0, name:`${s.niche || 'Script'} — ${s.stage || ''}`, meta:String(s.message || '').slice(0,70) + '…', tag:'Script'}));
+    const matches = leadMatches.concat(scriptMatches);
+    if(!matches.length){ results.innerHTML = '<div class="gs-empty">No results found.</div>'; return; }
+    results.innerHTML = matches.map(m => `<div class="gs-result" onclick="handleGSResultFixed('${m.type}',${Number(m.id)})"><div><div class="gs-result-name">${safeEsc(m.name)}</div><div class="gs-result-meta">${safeEsc(m.meta)}</div></div><span class="gs-result-tag">${safeEsc(m.tag)}</span></div>`).join('');
+  }
+
+  window.handleGSResultFixed = function(type, id){
+    byId('globalSearchOverlay')?.classList.remove('show');
+    if(type === 'lead'){
+      try { expandedId = id; } catch(e){}
+      try { if(typeof showTab === 'function') showTab('leads'); } catch(e){}
+      callRender();
+      setTimeout(()=>{
+        const card = document.querySelector(`.lead-card[data-id="${id}"]`);
+        if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); card.classList.add('focused-lead'); setTimeout(()=>card.classList.remove('focused-lead'), 2200); }
+      },120);
+    } else if(type === 'script') {
+      try { if(typeof showTab === 'function') showTab('scripts'); } catch(e){}
+    }
+  };
+
+  // Override the older broken handler after it runs.
+  byId('globalSearchInput')?.addEventListener('input', () => setTimeout(runSearch, 0));
+  const searchBtn = byId('globalSearchBtn');
+  if(searchBtn){
+    searchBtn.addEventListener('click', () => {
+      setTimeout(()=>{ byId('globalSearchInput')?.focus(); runSearch(); }, 60);
+    });
+  }
+
+  // 3) Make undo snapshot use the real state variable too.
+  try {
+    saveUndoSnapshot = function(label){
+      const st = appState();
+      if(!st) return;
+      window.__akUndoSnapshot = { label, snapshot: JSON.stringify(st) };
+      if(typeof showUndoToast === 'function') showUndoToast(label || 'Action completed.');
+    };
+    triggerUndo = function(){
+      const u = window.__akUndoSnapshot;
+      if(!u) return;
+      try {
+        state = JSON.parse(u.snapshot);
+        callSave(); callRender();
+        if(typeof toast === 'function') toast('Undone.');
+      } catch(e){}
+      window.__akUndoSnapshot = null;
+      byId('undoToast')?.classList.remove('show');
+    };
+    byId('undoBtn')?.addEventListener('click', triggerUndo);
+  } catch(e){}
+
+  // 4) Keep the outreach popup counter honest after every render/click.
+  function updatePopupRemaining(){
+    const el = byId('opRemainingCounter');
+    if(!el) return;
+    try {
+      const ch = typeof currentMode === 'function' ? currentMode() : (appState()?.settings?.mode || 'Instagram');
+      const target = Number(appState()?.settings?.[ch === 'Instagram' ? 'igGoal' : 'emailGoal'] || 0);
+      const t = today();
+      const sentToday = appLeads().filter(l => l.lastActionDate === t && (ch === 'Instagram' ? l.instagramSent : l.emailSent)).length;
+      const remaining = Math.max(0, target - sentToday);
+      el.innerHTML = `<strong>${remaining}</strong> outreaches remaining today`;
+    } catch(e){}
+  }
+  document.addEventListener('click', () => setTimeout(()=>{ updatePopupRemaining(); try{ if(typeof renderChannelConv === 'function') renderChannelConv(); }catch(e){} }, 80), true);
+
+  // First refresh after all other scripts finish.
+  window.addEventListener('load', function(){
+    setTimeout(()=>{ try { patchedRenderTables(); } catch(e){} runSearch(); updatePopupRemaining(); }, 250);
+  });
 })();
 </script>
 
